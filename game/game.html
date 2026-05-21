@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>The Permanent Way — Brunel's Resurrection</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --brass:#c9a84c;
+  --brass-glow:#e8c95a;
+  --deep-navy:#0a0e27;
+  --dark-navy:#101838;
+  --parchment:#f4e8c8;
+  --parchment-dark:#d4c8a8;
+  --steel:#4a5568;
+  --ember:#d45d3a;
+  --aurora:#3a9d8c;
+  --live:#22c55e;
+  --dead:#ef4444;
+  --heritage:#f97316;
+  --blood:#8b1a1a;
+}
+body{
+  background:var(--deep-navy);
+  color:var(--parchment);
+  font-family:'Cormorant Garamond',serif;
+  overflow:hidden;
+  height:100vh;
+  width:100vw;
+}
+#game-container{
+  display:grid;
+  grid-template-columns:1fr 400px;
+  grid-template-rows:56px 1fr;
+  height:100vh;
+  width:100vw;
+}
+header{
+  grid-column:1/3;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+  background:linear-gradient(180deg,var(--dark-navy),var(--deep-navy));
+  border-bottom:1px solid var(--brass);
+  z-index:10;
+}
+header h1{font-family:'Cinzel',serif;font-size:16px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--brass);text-shadow:0 0 20px rgba(201,168,76,0.3)}
+header .tagline{font-style:italic;color:var(--steel);font-size:13px;letter-spacing:1px}
+#map-panel{
+  position:relative;
+  background:radial-gradient(ellipse at 50% 50%,#0f1a3a,#060a1a);
+  overflow:hidden;cursor:grab;
+  image-rendering:pixelated;
+}
+#map-panel:active{cursor:grabbing}
+#map-panel .map-transform{transform-origin:0 0;width:100%;height:100%}
+#map-panel svg{width:100%;height:100%;display:block}
+#right-panel{
+  display:flex;flex-direction:column;
+  background:linear-gradient(180deg,var(--dark-navy),#0c1028);
+  border-left:1px solid rgba(201,168,76,0.3);
+  overflow:hidden;
+}
+#stats-bar{
+  display:flex;gap:4px;padding:8px 10px;
+  background:rgba(0,0,0,0.4);
+  border-bottom:1px solid rgba(201,168,76,0.2);
+  flex-wrap:wrap;
+}
+.stat{
+  display:flex;align-items:center;gap:3px;font-size:11px;
+  padding:3px 8px;border-radius:3px;
+  background:rgba(0,0,0,0.3);
+  border:1px solid rgba(201,168,76,0.15);
+}
+.stat .label{color:var(--steel);text-transform:uppercase;letter-spacing:1px;font-size:9px}
+.stat .value{font-family:'Cinzel',serif;font-weight:700;font-size:13px;color:var(--brass)}
+.stat.danger .value{color:var(--ember)}
+.stat .bar{width:50px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden}
+.stat .bar .fill{height:100%;border-radius:2px;transition:width 0.5s}
+#narrative-panel{
+  flex:1;padding:12px;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--brass) transparent;
+}
+#narrative-panel::-webkit-scrollbar{width:4px}
+#narrative-panel::-webkit-scrollbar-thumb{background:var(--brass);border-radius:2px}
+.narration{
+  font-size:14px;line-height:1.5;margin-bottom:10px;
+  padding:10px 14px;border-radius:6px;
+  border-left:3px solid var(--brass);
+  background:rgba(201,168,76,0.05);
+  animation:fadeIn 0.4s;
+}
+.narration.system{border-left-color:var(--aurora);background:rgba(58,157,140,0.05)}
+.narration.marc{border-left-color:var(--ember);font-style:italic;background:rgba(212,93,58,0.05)}
+.narration.marc::before{content:"⚡ Marc Brunel: ";font-style:normal;color:var(--ember);font-size:12px}
+.narration.event{border-left-color:var(--ember);background:rgba(139,26,26,0.08)}
+.narration.engineer{border-left-color:var(--brass-glow);background:rgba(232,201,90,0.08)}
+.narration.engineer .name{color:var(--brass-glow);font-weight:700}
+.narration .highlight{color:var(--brass);font-weight:600}
+.narration .contempt{color:var(--ember);font-style:italic}
+.choice{
+  display:block;width:100%;text-align:left;
+  padding:9px 14px;margin-bottom:5px;
+  background:rgba(201,168,76,0.08);
+  border:1px solid rgba(201,168,76,0.3);
+  border-radius:6px;color:var(--parchment);
+  font-family:'Cormorant Garamond',serif;font-size:14px;
+  cursor:pointer;transition:all 0.2s;
+}
+.choice:hover{background:rgba(201,168,76,0.2);border-color:var(--brass);transform:translateX(4px)}
+.choice:disabled{opacity:0.4;cursor:default}
+.turn-counter{
+  text-align:center;font-family:'Cinzel',serif;font-size:11px;
+  color:var(--steel);padding:6px;
+  border-bottom:1px solid rgba(201,168,76,0.1);letter-spacing:2px;
+}
+.story-title{font-family:'Cinzel',serif;font-size:12px;color:var(--brass);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+#engineer-portrait{
+  padding:8px 12px;background:rgba(0,0,0,0.3);
+  border-bottom:1px solid rgba(201,168,76,0.2);
+  display:none;
+  gap:10px;align-items:center;
+}
+#engineer-portrait.active{display:flex}
+#engineer-portrait .avatar{
+  width:50px;height:50px;border-radius:50%;
+  border:2px solid var(--brass);
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;background:rgba(201,168,76,0.1);
+}
+#engineer-portrait .info{flex:1;font-size:12px}
+#engineer-portrait .info .name{font-family:'Cinzel',serif;color:var(--brass-glow);font-size:14px}
+#engineer-portrait .info .desc{color:var(--parchment-dark);font-style:italic;font-size:11px}
+#engineer-portrait .info .bonus{color:var(--aurora);font-size:11px}
+#overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(6,10,26,0.95);z-index:100;
+  justify-content:center;align-items:center;
+  flex-direction:column;text-align:center;padding:40px;
+}
+#overlay.active{display:flex}
+#overlay h2{font-family:'Cinzel',serif;font-size:38px;color:var(--brass);text-shadow:0 0 40px rgba(201,168,76,0.4);margin-bottom:12px}
+#overlay p{font-size:18px;line-height:1.6;max-width:600px;margin-bottom:20px;color:var(--parchment-dark)}
+#overlay .btn{
+  padding:12px 36px;font-family:'Cinzel',serif;font-size:15px;
+  background:transparent;border:2px solid var(--brass);color:var(--brass);
+  cursor:pointer;letter-spacing:3px;text-transform:uppercase;transition:all 0.3s;
+}
+#overlay .btn:hover{background:var(--brass);color:var(--deep-navy)}
+#overlay .subtitle{font-style:italic;color:var(--steel);font-size:15px;margin-bottom:24px}
+#overlay .vape-cloud{font-size:60px;margin-bottom:16px;animation:billow 3s ease-in-out infinite}
+@keyframes billow{0%,100%{opacity:0.3;transform:scale(0.8)}50%{opacity:1;transform:scale(1.2)}}
+.map-city circle{transition:r 0.3s;cursor:pointer}
+.map-line{fill:none;stroke-width:2;opacity:0.5;transition:all 0.5s}
+.map-line.live{stroke:var(--live);stroke-width:3;opacity:1;filter:url(#glow)}
+.map-line.dead{stroke:var(--dead);stroke-width:2;opacity:0.7;stroke-dasharray:6,3}
+.map-line.heritage{stroke:var(--heritage);stroke-width:2.5;opacity:0.8;stroke-dasharray:2,2}
+.map-line.available{cursor:pointer;opacity:0.9;stroke-width:2.5}
+.map-line.available:hover{stroke-width:5;opacity:1;stroke:var(--brass-glow)}
+#zoom-controls{
+  position:absolute;bottom:12px;right:12px;display:flex;flex-direction:column;gap:3px;z-index:20;
+}
+#zoom-controls button{
+  width:30px;height:30px;background:rgba(10,14,39,0.85);
+  border:1px solid var(--brass);border-radius:3px;
+  color:var(--brass);font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-family:monospace;
+}
+#zoom-controls button:hover{background:rgba(201,168,76,0.2)}
+#zoom-level{
+  position:absolute;bottom:12px;left:12px;
+  font-size:10px;font-family:monospace;color:var(--steel);
+  z-index:20;background:rgba(10,14,39,0.7);padding:2px 6px;border-radius:3px;
+}
+#route-legend{
+  position:absolute;top:10px;right:10px;z-index:20;
+  font-size:10px;padding:8px 10px;
+  background:rgba(10,14,39,0.85);
+  border:1px solid rgba(201,168,76,0.2);border-radius:4px;
+  line-height:1.8;
+}
+#route-legend .legend-item{display:flex;align-items:center;gap:6px}
+#route-legend .legend-dot{width:10px;height:3px;border-radius:1px}
+.achievement{
+  position:absolute;top:16px;left:50%;transform:translateX(-50%);
+  padding:10px 20px;background:rgba(201,168,76,0.15);
+  border:1px solid var(--brass);border-radius:6px;
+  font-family:'Cinzel',serif;font-size:13px;color:var(--brass);
+  text-align:center;animation:fadeIn 0.5s;z-index:50;pointer-events:none;white-space:nowrap;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.particle{
+  position:absolute;pointer-events:none;border-radius:50%;
+  background:var(--brass);opacity:0.2;animation:drift linear infinite;
+}
+@keyframes drift{
+  0%{transform:translateY(0) translateX(0);opacity:0}
+  10%{opacity:0.2}
+  90%{opacity:0.05}
+  100%{transform:translateY(-150px) translateX(40px);opacity:0}
+}
+#engineer-list{
+  padding:8px 12px;background:rgba(0,0,0,0.2);
+  border-bottom:1px solid rgba(201,168,76,0.1);
+  display:none;flex-wrap:wrap;gap:4px;
+}
+#engineer-list.active{display:flex}
+#engineer-list .recruited{
+  font-size:10px;padding:3px 8px;border-radius:12px;
+  background:rgba(232,201,90,0.15);border:1px solid rgba(232,201,90,0.3);
+  color:var(--brass-glow);font-family:'Cinzel',serif;
+}
+@media(max-width:800px){
+  #game-container{grid-template-columns:1fr;grid-template-rows:48px 45vh 1fr}
+  #right-panel{border-left:none;border-top:1px solid rgba(201,168,76,0.3)}
+  header h1{font-size:13px}header .tagline{font-size:11px}
+}
+</style>
+</head>
+<body>
+
+<div id="overlay" class="active">
+  <div class="vape-cloud">💨</div>
+  <h2>The Permanent Way</h2>
+  <p class="subtitle">"This gradient is an insult to God and Isambard."</p>
+  <p>The HS2 breach has torn open a portal beneath the Chilterns.<br>
+  Isambard Kingdom Brunel steps through, vaping furiously, wearing a blouse torn open to reveal a chest carved by God and Victorian engineering.</p>
+  <p>The railways are severed. The nation is fragmented.<br>
+  <span style="color:var(--ember);font-style:italic;">Modern project managers have been in charge for 60 years. Look what that got you.</span></p>
+  <p><em>He built it once. Now he's back, and he's <strong>furious</strong>.</em></p>
+  <button class="btn" onclick="startGame()">BEGIN RESURRECTION</button>
+</div>
+
+<div id="game-container">
+  <header>
+    <h1>⟡ THE PERMANENT WAY</h1>
+    <span class="tagline">"Your KPIs mean nothing in the presence of true genius"</span>
+  </header>
+
+  <div id="map-panel">
+    <div id="route-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--live)"></div> Live</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--dead)"></div> Destroyed</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--heritage)"></div> Heritage</div>
+    </div>
+  </div>
+
+  <div id="right-panel">
+    <div class="turn-counter" id="turnDisplay">WEEK 1 · YEAR OF RESURRECTION 1</div>
+    <div id="engineer-list"></div>
+    <div id="stats-bar">
+      <div class="stat"><span class="label">⚙ ENG</span><span class="value" id="engStat">65</span><div class="bar"><div class="fill" id="engFill" style="width:65%;background:var(--aurora)"></div></div></div>
+      <div class="stat"><span class="label">£ FND</span><span class="value" id="fndStat">55</span><div class="bar"><div class="fill" id="fndFill" style="width:55%;background:var(--brass)"></div></div></div>
+      <div class="stat"><span class="label">⚐ POL</span><span class="value" id="polStat">45</span><div class="bar"><div class="fill" id="polFill" style="width:45%;background:var(--ember)"></div></div></div>
+      <div class="stat"><span class="label">♡ MOR</span><span class="value" id="morStat">50</span><div class="bar"><div class="fill" id="morFill" style="width:50%;background:#c084fc"></div></div></div>
+    </div>
+    <div id="narrative-panel"></div>
+  </div>
+</div>
+
+<script>
+const MAP_URL='https://upload.wikimedia.org/wikipedia/commons/a/a8/Britanniques_%28Iles%29._-_Lloyd%27s_topographical_Railway_and_county_map_of_the_British_Isles..._-_btv1b53022772z_%281_of_4%29.jpg';
+
+const ENGINEERS=[
+  {id:'brunel',name:'Isambard "The King" Brunel',emoji:'💨',title:'The King',
+   desc:'Ripped blouse. E-cig clouding like a steam engine. Chest hair you could lose a theodolite in. Mutters "amateurs" at every HS2 sign he passes.',
+   bonus:{eng:5,mor:3},quote:'I once designed a bridge, a tunnel, and a steamship between breakfast and luncheon. What have you done today?',unlock:0},
+  {id:'stephenson',name:'George "Rocket" Stephenson',emoji:'🔥',title:'The Rocket',
+   desc:'Barrel chest stuffed into a waistcoat that surrendered years ago. Muttonchops you could stable a pony in. Flat cap pulled low over eyes that have seen real engineering.',
+   bonus:{eng:4,fnd:2},quote:'Ye call that a rail? I've seen stronger cheese. And I LIKE cheese. But I wouldn't build a railway on it.',unlock:2},
+  {id:'stephenson_r',name:'Robert Stephenson',emoji:'🏛️',title:'The Prince',
+   desc:'Chiselled jaw. Sideburns that could cast their own shadow. Waistcoat stretched heroically over a chest that built the Britannia Bridge. Polite. Devastating.',
+   bonus:{eng:3,pol:3},quote:'My father built the Rocket. I built the Britannia. You built a risk register. Let us not speak of it further.',unlock:4},
+  {id:'hawkshaw',name:'Sir John "Viaduct" Hawkshaw',emoji:'🌉',title:'The Viaduct',
+   desc:'A beard that deserves its own postal address. His stare can make young engineers reconsider their career choices. Built the Severn Tunnel by glaring at the river until it moved.',
+   bonus:{eng:4,mor:-1},quote:'My bridges stand for centuries. Your "stakeholder engagement framework" will not.',unlock:6},
+  {id:'fowler',name:'Sir John "Forth" Fowler',emoji:'🏗️',title:'The Colossus',
+   desc:'Top hat. Monocle. Shoulders wide as a tunnel bore. Designed the Forth Bridge while simultaneously arm-wrestling three lesser engineers. A man who has never experienced self-doubt.',
+   bonus:{fnd:5,eng:1},quote:'I built the Forth Bridge. You built a Trello board. We are not the same.',unlock:8},
+  {id:'barlow',name:'William "Bold" Barlow',emoji:'⚡',title:'The Bold',
+   desc:'Wing collar straining at the seams. Eyebrows that conduct their own meetings. Invented the Barlow rail while fighting a duel. On a train. That he also designed.',
+   bonus:{fnd:3,mor:3},quote:'You have never drawn a stress diagram in your LIFE, have you? That is not a rhetorical question. I can see it in your eyes.',unlock:10},
+];
+
+const ROUTES=[
+  {id:'gwr',name:'Great Western Railway',sfrom:'London',sto:'Bristol',status:'dead',desc:'Brunel\'s own masterpiece. Broad gauge. Atmospheric propulsion. Modernised into mediocrity by people who don\'t know a fishplate from a spreadsheet.',diff:1,reward:{eng:3,fnd:4,pol:2,mor:4},event:'gwr'},
+  {id:'wcr',name:'West Coast Main Line',sfrom:'London',sto:'Glasgow',status:'live',desc:'The spine. 400 miles. Should be a wonder of the world. Instead it\'s been "optimised" by management consultants until it runs on spreadsheets and prayers.',diff:3,reward:{eng:4,fnd:8,pol:5,mor:3},event:'wcr'},
+  {id:'ecr',name:'East Coast Main Line',sfrom:'London',sto:'Edinburgh',status:'live',desc:'Speed. Elegance. Stephenson\'s route. Brunel\'s envy. Still running, but only just — held together by the prayers of enthusiasts and the sheer will of the Victorian iron.',diff:3,reward:{eng:3,fnd:7,pol:6,mor:4},event:'ecr'},
+  {id:'som',name:'Somerset & Dorset',sfrom:'Bristol',sto:'Southampton',status:'dead',desc:'Beeching\'s cruelest cut. A line that connected communities for a century, closed by a man in a suit who had never walked a mile of track in his life. Sixty years of rot. Bring it back.',diff:2,reward:{eng:1,fnd:2,pol:4,mor:6},event:'som'},
+  {id:'mid',name:'Midland Main Line',sfrom:'Derby',sto:'London',status:'live',desc:'Coal. Iron. Steam. The Midlands built this country. Now it\'s run by people who think "rolling stock" is an inventory management problem.',diff:2,reward:{eng:2,fnd:4,pol:3,mor:3},event:'mid'},
+  {id:'cny',name:'Channel Tunnel Link',sfrom:'London',sto:'Folkestone',status:'live',desc:'The Victorian dream of a dry crossing. Finally built — in the 1990s. And already neglected because modern Britain doesn\'t do maintenance, it does "deferred asset management."',diff:4,reward:{eng:6,fnd:10,pol:5,mor:5},event:'cny'},
+  {id:'wls',name:'Cambrian Railways',sfrom:'Shrewsbury',sto:'Aberystwyth',status:'heritage',desc:'Into the Welsh mountains. Narrow gauge. Stubborn as the terrain. Kept alive by volunteers because the government couldn\'t be bothered. Heritage status — charming, underfunded, hanging on.',diff:2,reward:{eng:1,fnd:1,pol:3,mor:5},event:'wls'},
+  {id:'hgh',name:'Highland Line',sfrom:'Glasgow',sto:'Inverness',status:'live',desc:'Through the Grampians. The unforgiving North. Still running because the Highlands refuse to be ignored. But for how long? Every budget review suggests "rationalisation."',diff:4,reward:{eng:5,fnd:6,pol:4,mor:7},event:'hgh'},
+  {id:'gwr_ext',name:'Great Western Extension',sfrom:'Bristol',sto:'Plymouth',status:'dead',desc:'Brunel\'s reach into the West Country. Closed by Beeching. Villages along the route have been waiting sixty years for someone to remember they exist.',diff:3,reward:{eng:4,fnd:5,pol:5,mor:6},event:'gwr_ext'},
+  {id:'dub_bel',name:'Dublin–Belfast Main Line',sfrom:'Dublin',sto:'Belfast',status:'live',desc:'The corridor that connects two nations. Survived partition, survived the Troubles, survived privatisation. Iron-willed. Like the people who travel it.',diff:3,reward:{eng:3,fnd:6,pol:6,mor:5},event:'dub_bel'},
+  {id:'dub_cork',name:'Dublin–Cork Main Line',sfrom:'Dublin',sto:'Cork',status:'live',desc:'The Southern artery. Fastest train in Ireland — which isn\'t saying much, but it\'s the thought that counts. Needs upgrading to match Brunel\'s standards.',diff:2,reward:{eng:2,fnd:4,pol:3,mor:4},event:'dub_cork'},
+  {id:'bel_derry',name:'Belfast–Derry Line',sfrom:'Belfast',sto:'Derry',status:'dead',desc:'The neglected North West. One of the worst main lines in these islands. Single track. Speed limit of 50. A disgrace. Restore it to Victorian glory.',diff:2,reward:{eng:2,fnd:3,pol:5,mor:5},event:'bel_derry'},
+  {id:'dub_gal',name:'Dublin–Galway West Line',sfrom:'Dublin',sto:'Galway',status:'dead',desc:'The line to the West. Closed to passengers in the 70s. The Atlantic coast waits. Reconnect the West — they\'ve been patient long enough.',diff:3,reward:{eng:3,fnd:4,pol:4,mor:6},event:'dub_gal'},
+  {id:'wls_ext',name:'Welsh Marches Line',sfrom:'Shrewsbury',sto:'Swansea',status:'live',desc:'Through the beautiful, stubborn Welsh terrain. Still operational but neglected. Signalling from the 1970s. Track from the 1950s. Hope from the 1840s.',diff:3,reward:{eng:4,fnd:5,pol:3,mor:4},event:'wls_ext'},
+];
+
+const CONTEMPT = [
+  '"A \u201Cbusiness case\u201D? I am Isambard Kingdom Brunel. My business case is three cigar stubs and a napkin sketch."',
+  '"You have \u201Cproject managers\u201D? In my day, we had \u201Cengineers\u201D. They were the same person."',
+  '"This \u201CRisk Register\u201D appears to be a list of things you\'re too timid to attempt."',
+  '"HS2 has a \u201Cstakeholder engagement lead\u201D. I had a horse. The horse was more useful."',
+  '"Spreadsheets. Spreadsheets everywhere. I built the Great Western Railway with a slide rule and pure contempt for the impossible."',
+  '"Your \u201Csafety culture\u201D is just another word for \u201Cwe\'ve never done anything bold in our lives.\u201D"',
+  '"You\'ve \u201Coutsourced\u201D the engineering? To whom? The lowest bidder? I\'d rather outsource it to a particularly determined badger."',
+  '"This document is 400 pages long and contains not a single drawing of a bridge. I despair for your species."',
+  '"You hold \u201Cworkshops\u201D to decide things. I held a compass and a straight edge. The compass never asked for everyone\'s opinion."',
+  '"Sustainability targets? The Great Western Railway is STILL RUNNING 180 years later. That\'s sustainability. Your \u201Cnet zero strategy\u201D is a PowerPoint."',
+  '"I have been dead 170 years and I can still build a better railway than your entire consulting industry combined. Let that sink in."',
+  '"You don\'t need a \u201Ctransport strategy.\u201D You need six months of hard labour and a proper engineer. I\u2019m available."',
+  '"This train has a \u201Csilent carriage.\u201D In my day, every carriage was silent — because we built them properly and you could hear yourself think."',
+  '"You\u2019ve \u201Cmarket tested\u201D the gradient? The gradient is not a marketing exercise. The gradient is a conversation between the engine and the earth."',
+];
+
+const EVENTS = {
+  gwr:[
+    {text:'Network Rail sends a "feasibility study team" to assess the Great Western. They have clipboards. They have risk matrices. They have no idea what they\'re doing.',choices:[{text:'Throw the clipboards in the canal. Begin laying track by dawn.',effect:{eng:2,pol:-3}},{text:'Let them do their study. Then ignore it completely and build it properly.',effect:{eng:1,pol:2,fnd:-2}}]},
+    {text:'A local historian finds Brunel\'s original 1833 specification for the line. It\'s six pages. The modern equivalent is 4,000.',choices:[{text:'Read it aloud at the town hall. Shame the modern age.',effect:{mor:5,pol:2}},{text:'Frame it and put it in the station. Let the public see what real engineering looks like.',effect:{mor:3,eng:1}}]},
+  ],
+  wcr:[
+    {text:'A "Productivity Consultant" arrives to "optimise" your workforce. He uses words like "synergy" and "touch base."',choices:[{text:'Challenge him to lay 50 yards of track in an hour. He fails. You win. Forever.',effect:{mor:4,eng:1}},{text:'Make him carry rails until he learns the true meaning of "synergy."',effect:{eng:2,mor:2}}]},
+    {text:'The West Coast signalling system — last updated 1973 — finally gives up. Trains stop. Chaos ensues. The modern team panic.',choices:[{text:'Design a new signalling system on a napkin. Implement it in a week.',effect:{eng:-3,fnd:-2,mor:5}},{text:'Use the old system. Fix it with Victorian practicality and a large hammer.',effect:{eng:2,fnd:1}}]},
+  ],
+  ecr:[
+    {text:'A "heritage impact assessment" is required before you can touch the line. The assessment takes longer than building the original line did.',choices:[{text:'Build first. Ask forgiveness later. The Victorians way.',effect:{eng:3,pol:-2,mor:2}},{text:'Sit through the assessment. Point out every flaw in modern methodology.',effect:{pol:3,eng:-1}}]},
+    {text:'The Flying Scotsman is stuck behind a modern commuter train. The driver doesn\'t know the road. Brunel is apoplectic.',choices:[{text:'Take the controls yourself. Show them how it\'s done.',effect:{mor:5,eng:2}},{text:'Replace the driver with a qualified Victorian ghost.',effect:{mor:2,eng:-1,pol:-1}}]},
+  ],
+  som:[
+    {text:'Villages along the old Somerset & Dorset hear you\'re reopening it. They\'ve been waiting 60 years. They bring banners. One says "BRUNEL FOR PM."',choices:[{text:'Let them lay the first rail. A ceremony heals old wounds.',effect:{mor:6,pol:3}},{text:'Work quietly. Promises before celebration. You\'ve seen modern politicians.',effect:{eng:2,pol:2}}]},
+    {text:'A "consultation period" is opened. The closing date is 12 weeks from now. You start laying track at midnight.',choices:[{text:'Consultation? I consulted my conscience. It said build.',effect:{eng:3,mor:3,pol:-3}},{text:'Attend one meeting. Demolish their arguments with pure engineering logic.',effect:{pol:3,eng:1}}]},
+  ],
+  mid:[
+    {text:'A "stakeholder workshop" is scheduled. The attendees include three councillors, two activists, a poet, and someone described as a "cycling advocate."',choices:[{text:'Cancel the workshop. Build the railway. Let the railway be your consultation document.',effect:{eng:3,pol:-3,mor:2}},{text:'Attend. Use the workshop to demonstrate — with diagrams — why your railway is objectively correct.',effect:{pol:4,eng:-1}}]},
+  ],
+  cny:[
+    {text:'The French send a delegation to inspect progress. They are polite. They are efficient. They are everything modern Britain is not. Brunel takes this personally.',choices:[{text:'Impress them. Lay a mile of track between breakfast and lunch.',effect:{eng:-2,mor:5,pol:4}},{text:'Challenge the French lead to an arm-wrestle. Winner decides the timetable.',effect:{mor:3,pol:1}}]},
+  ],
+  wls:[
+    {text:'A "sustainability officer" insists the line must use "locally sourced, carbon-neutral sleepers." Brunel picks up a rail and carries it himself.',choices:[{text:'Use local timber. Show that sustainability and speed are not enemies.',effect:{fnd:-2,pol:3,mor:2}},{text:'Import the best materials from wherever they come from. Excellence has no postal code.',effect:{eng:3,fnd:-3,mor:1}}]},
+    {text:'Welsh nationalists rename the line "Rheilffordd y Cambrian." Brunel approves. "It\'s still a railway," he says, "and railways don\'t care about borders."',choices:[{text:'Embrace the name. Welsh signs throughout.',effect:{pol:3,mor:4}},{text:'Keep English signs but add Welsh translations. Pragmatism.',effect:{pol:2,eng:1}}]},
+  ],
+  hgh:[
+    {text:'Winter comes early. Snow buries the Highland line. Modern equipment fails. Victorian know-how prevails.',choices:[{text:'Lead a rescue party with nothing but a compass and a hip flask.',effect:{mor:6,eng:-1}},{text:'Wait for the thaw. The Highlanders have been waiting centuries; they can wait a bit longer.',effect:{mor:-2,pol:2}}]},
+  ],
+  gwr_ext:[
+    {text:'A farmer whose great-grandfather sold land to Brunel offers right-of-way. His price: a first-class ticket on the reopening day.',choices:[{text:'Accept immediately. That\'s the kind of deal Brunel understands.',effect:{mor:4,pol:2,fnd:-1}},{text:'Name a station after his family. Cheaper, more permanent.',effect:{fnd:-2,mor:3,pol:1}}]},
+  ],
+  dub_bel:[
+    {text:'Cross-border politics threaten to delay the project. The Irish ask "What would Brunel do?" The answer is obvious.',choices:[{text:'Build it anyway. Politics is temporary; railways are forever.',effect:{eng:3,pol:-2,mor:3}},{text:'Hold a summit. Use your charisma to unite both sides.',effect:{pol:5,eng:-1}}]},
+  ],
+  dub_cork:[
+    {text:'Irish Rail insists on a "modernisation programme." This means replacing Victorian craftsmanship with Chinese rolling stock. Brunel is apoplectic.',choices:[{text:'Restore the original carriages. Modern comfort, Victorian soul.',effect:{fnd:-3,mor:4,eng:2}},{text:'Compromise — new trains, Victorian aesthetics, Irish steel.',effect:{fnd:-2,pol:3}}]},
+  ],
+  bel_derry:[
+    {text:'The line to Derry is so neglected that locals have built a garden on the trackbed. They\'re not sure if a train still runs.',choices:[{text:'Clear the garden personally. Promise them a station worth tending.',effect:{mor:5,eng:1}},{text:'Reroute slightly. Build a station closer to the city centre.',effect:{fnd:-4,pol:3,mor:2}}]},
+  ],
+  dub_gal:[
+    {text:'The West of Ireland has been waiting 50 years for this. They greet Brunel like a messiah. He accepts this as his due.',choices:[{text:'Hold a rally. Promise them the Atlantic Railway.',effect:{mor:6,pol:3}},{text:'Get straight to work. Deeds, not words.',effect:{eng:3,mor:2}}]},
+  ],
+  wls_ext:[
+    {text:'The Welsh Marches line runs at 60mph where it should run at 90. "Ninety," Brunel mutters, "is the minimum speed for dignity."',choices:[{text:'Re-lay the entire trackbed for 90mph running.',effect:{fnd:-5,eng:4,mor:3}},{text:'Improve signalling and clearance. Accept 75mph for now.',effect:{fnd:-2,eng:2,pol:2}}]},
+  ],
+};
+
+const FREE_EVENTS = [
+  {text:'BRUNEL: He takes a long drag on his e-cig, the vapour cloud obscuring a modern luxury apartment block built on an old shunting yard. "That building will be there 40 years," he says. "My railway would have been there 400."',type:'engineer',eng:'brunel',effect:{mor:3,eng:1}},
+  {text:'Marc Brunel appears in the reflection of a puddle on a disused platform. "The line remembers you, Isambard. Feel it in your boots. The iron sings when you\'re near it."',type:'marc',effect:{eng:3}},
+  {text:'A child at a level crossing hands Brunel a penny. "For the railway, mister." Brunel takes it. His hand trembles. "This," he says, "is more funding than I ever got from a feasibility study."',type:'system',effect:{mor:5}},
+  {text:'The Times runs a profile: "Brunel — Genius or Menace?" The letters page is full of retired engineers saying "Yes."',type:'event',effect:{pol:2,mor:2}},
+  {text:'An old railwayman recognises Brunel at a closed station. He cries. He remembers his father working the Great Western. The father told him stories. "You were real," the old man whispers.',type:'system',effect:{mor:5}},
+  {text:'The HS2 press office issues a statement: "Mr. Brunel is a historical re-enactor with no recognised qualifications." Brunel responds by designing a bridge on live television using only a fountain pen and righteous fury.',type:'event',effect:{pol:-1,mor:4,eng:2}},
+  {text:'A modern architect explains to Brunel why his station design can\'t work. Brunel listens. Brunel builds it anyway. It works. The architect resigns.',type:'event',effect:{mor:3,eng:2}},
+  {text:'A pigeon delivers a note tied to its leg — written on Thames Tunnel letterhead. "The gradient is wrong in the Severn approach," Marc writes. "I\'d fix it myself but I\'m dead, you useless boy."',type:'marc',effect:{eng:3,mor:-1}},
+];
+
+let state={
+  turn:1,eng:65,fnd:55,pol:45,mor:50,
+  restored:[],available:[],status:{},
+  engineers:[],unlockedEng:0,
+  started:false,gameOver:false,busy:false,
+  recruitedNames:[],vapeCharge:100,
+};
+
+for(const r of ROUTES){
+  if(r.status==='live')state.restored.push(r.id);
+  else if(r.status==='dead'||r.status==='heritage')state.available.push(r.id);
+  state.status[r.id]=r.status;
+}
+
+function clamp(v){return Math.max(0,Math.min(100,v))}
+
+const CITIES={
+  london:{x:478,y:632,name:'London'},bristol:{x:365,y:636,name:'Bristol'},
+  southampton:{x:440,y:660,name:'Southampton'},birmingham:{x:397,y:548,name:'Birmingham'},
+  liverpool:{x:345,y:462,name:'Liverpool'},manchester:{x:381,y:465,name:'Manchester'},
+  glasgow:{x:288,y:264,name:'Glasgow'},edinburgh:{x:337,y:257,name:'Edinburgh'},
+  york:{x:370,y:380,name:'York'},newcastle:{x:350,y:325,name:'Newcastle'},
+  derby:{x:390,y:490,name:'Derby'},nottingham:{x:405,y:500,name:'Nottingham'},
+  shrewsbury:{x:340,y:490,name:'Shrewsbury'},aberystwyth:{x:296,y:554,name:'Aberystwyth'},
+  folkestone:{x:502,y:653,name:'Folkestone'},inverness:{x:289,y:128,name:'Inverness'},
+  swansea:{x:310,y:580,name:'Swansea'},plymouth:{x:320,y:685,name:'Plymouth'},
+  dublin:{x:170,y:430,name:'Dublin'},belfast:{x:211,y:371,name:'Belfast'},
+  cork:{x:94,y:598,name:'Cork'},galway:{x:100,y:470,name:'Galway'},
+  derry:{x:170,y:334,name:'Derry'},
+};
+
+let mapZoom=1,mapPanX=0,mapPanY=0,mapDragging=false,mapDragStartX,mapDragStartY;
+
+function renderMap(){
+  const panel=document.getElementById('map-panel');
+  const routeLines=ROUTES.map(r=>{
+    const fCity=CITIES[r.sfrom.toLowerCase().replace(/\s/g,'')]||{x:300,y:400};
+    const tCity=CITIES[r.sto.toLowerCase().replace(/\s/g,'')]||{x:300,y:400};
+    const st=state.status[r.id];
+    const cls=st==='dead'?'dead':st==='heritage'?'heritage':'live';
+    const avail=state.available.includes(r.id);
+    const col=st==='dead'?'#ef4444':st==='heritage'?'#f97316':'#22c55e';
+    return `<line x1="${fCity.x}" y1="${fCity.y}" x2="${tCity.x}" y2="${tCity.y}" 
+      class="map-line ${cls} ${avail?'available':''}" 
+      stroke="${col}" data-route="${r.id}" style="cursor:${avail?'pointer':'default'}"/>`;
+  }).join('');
+  const cityMarkers=Object.entries(CITIES).map(([id,c])=>{
+    const isLondon=id==='london';
+    return `<circle cx="${c.x}" cy="${c.y}" r="${isLondon?5:3}" fill="${isLondon?'#d45d3a':'#c9a84c'}" opacity="0.9"/>
+      <text x="${c.x+(isLondon?7:-6)}" y="${c.y+2}" fill="${isLondon?'#d45d3a':'#c9a84c'}" 
+      font-size="7" font-family="Cinzel,serif" text-anchor="${isLondon?'start':'end'}" opacity="0.9">${c.name}</text>`;
+  }).join('');
+
+  panel.innerHTML=`<div class="map-transform" id="mapTransform">
+    <svg viewBox="0 0 600 800" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="glow"><feGaussianBlur stdDeviation="1.5" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="glowStrong"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <radialGradient id="cityGlow"><stop offset="0%" stop-color="#c9a84c" stop-opacity="0.6"/><stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/></radialGradient>
+      </defs>
+      <image href="${MAP_URL}" x="0" y="0" width="600" height="800" preserveAspectRatio="xMidYMid meet" opacity="0.85"/>
+      ${routeLines}
+      ${cityMarkers}
+      ${state.restored.map(id=>{
+        const r=ROUTES.find(x=>x.id===id);
+        if(!r)return'';
+        const gf=CITIES[r.sfrom.toLowerCase().replace(/\s/g,'')]||{x:300,y:400};
+        const gt=CITIES[r.sto.toLowerCase().replace(/\s/g,'')]||{x:300,y:400};
+        return `<circle cx="${gf.x}" cy="${gf.y}" r="14" fill="url(#cityGlow)"/><circle cx="${gt.x}" cy="${gt.y}" r="14" fill="url(#cityGlow)"/>`;
+      }).join('')}
+    </svg></div>
+    <div id="zoom-controls">
+      <button id="zoomIn">+</button><button id="zoomOut">−</button><button id="zoomReset">⟲</button>
+    </div>
+    <div id="zoom-level">100%</div>`;
+
+  applyMapTransform();
+  setupMapInteraction(panel);
+}
+
+function applyMapTransform(){
+  const el=document.getElementById('mapTransform');
+  if(!el)return;
+  el.style.transform=`translate(${mapPanX}px,${mapPanY}px) scale(${mapZoom})`;
+  const zl=document.getElementById('zoom-level');
+  if(zl)zl.textContent=Math.round(mapZoom*100)+'%';
+}
+
+function setupMapInteraction(panel){
+  panel.querySelectorAll('.map-line.available').forEach(line=>{
+    line.addEventListener('click',e=>{
+      if(mapDragging)return;
+      const rid=line.dataset.route;
+      if(!state.busy&&!state.gameOver)attemptRestore(rid);
+    });
+  });
+  document.getElementById('zoomIn').addEventListener('click',()=>zoomMap(0.3));
+  document.getElementById('zoomOut').addEventListener('click',()=>zoomMap(-0.3));
+  document.getElementById('zoomReset').addEventListener('click',()=>{mapZoom=1;mapPanX=0;mapPanY=0;applyMapTransform();});
+  panel.addEventListener('wheel',e=>{e.preventDefault();zoomMap(e.deltaY>0?-0.1:0.1,e.offsetX,e.offsetY);},{passive:false});
+  panel.addEventListener('mousedown',e=>{mapDragging=true;mapDragStartX=e.clientX-mapPanX;mapDragStartY=e.clientY-mapPanY;});
+  document.addEventListener('mousemove',e=>{if(!mapDragging)return;mapPanX=e.clientX-mapDragStartX;mapPanY=e.clientY-mapDragStartY;applyMapTransform();});
+  document.addEventListener('mouseup',()=>{setTimeout(()=>{mapDragging=false;},10);});
+  let lastTouchDist=0;
+  panel.addEventListener('touchstart',e=>{if(e.touches.length===2){const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;lastTouchDist=Math.sqrt(dx*dx+dy*dy);}},{passive:true});
+  panel.addEventListener('touchmove',e=>{if(e.touches.length!==2)return;e.preventDefault();const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY,dist=Math.sqrt(dx*dx+dy*dy);if(lastTouchDist){const delta=(dist-lastTouchDist)/100;zoomMap(delta);}lastTouchDist=dist;},{passive:false});
+  panel.addEventListener('touchend',()=>{lastTouchDist=0;},{passive:true});
+}
+
+function zoomMap(delta,cx,cy){
+  const panel=document.getElementById('map-panel');
+  const rect=panel.getBoundingClientRect();
+  const mx=cx!=null?cx:rect.width/2;
+  const my=cy!=null?cy:rect.height/2;
+  const oldZoom=mapZoom;
+  mapZoom=Math.max(0.3,Math.min(5,mapZoom+delta));
+  const scale=mapZoom/oldZoom;
+  mapPanX=mx-scale*(mx-mapPanX);
+  mapPanY=my-scale*(my-mapPanY);
+  applyMapTransform();
+}
+
+function updateStats(){
+  document.getElementById('engStat').textContent=state.eng;
+  document.getElementById('fndStat').textContent=state.fnd;
+  document.getElementById('polStat').textContent=state.pol;
+  document.getElementById('morStat').textContent=state.mor;
+  document.getElementById('engFill').style.width=state.eng+'%';
+  document.getElementById('fndFill').style.width=state.fnd+'%';
+  document.getElementById('polFill').style.width=state.pol+'%';
+  document.getElementById('morFill').style.width=state.mor+'%';
+  document.getElementById('turnDisplay').textContent=`WEEK ${state.turn} · YEAR OF RESURRECTION 1`;
+  document.querySelectorAll('.stat').forEach(s=>s.classList.toggle('danger',parseInt(s.querySelector('.value').textContent)<20));
+  updateEngineerList();
+}
+
+function updateEngineerList(){
+  const el=document.getElementById('engineer-list');
+  if(state.engineers.length===0){el.classList.remove('active');return;}
+  el.classList.add('active');
+  el.innerHTML=state.engineers.map(e=>`<span class="recruited">${e.emoji} ${e.name}</span>`).join('');
+}
+
+function addNarration(text,type='narration'){
+  const panel=document.getElementById('narrative-panel');
+  const div=document.createElement('div');
+  div.className=`narration ${type}`;
+  div.innerHTML=text;
+  panel.appendChild(div);
+  panel.scrollTop=panel.scrollHeight;
+}
+
+function addChoices(choices){
+  const panel=document.getElementById('narrative-panel');
+  choices.forEach((c,i)=>{
+    const btn=document.createElement('button');
+    btn.className='choice';
+    btn.textContent=c.text;
+    btn.addEventListener('click',()=>resolveChoice(i,c));
+    panel.appendChild(btn);
+  });
+}
+
+function resolveChoice(idx,choice){
+  state.busy=true;
+  disableChoices();
+  if(choice.effect){
+    state.eng=clamp(state.eng+(choice.effect.eng||0));
+    state.fnd=clamp(state.fnd+(choice.effect.fnd||0));
+    state.pol=clamp(state.pol+(choice.effect.pol||0));
+    state.mor=clamp(state.mor+(choice.effect.mor||0));
+    updateStats();
+  }
+  removeChoices();
+  addNarration('Your decision echoes across the network. The work continues.','system');
+  state.busy=false;
+  endTurn();
+}
+
+function disableChoices(){document.querySelectorAll('.choice').forEach(b=>b.disabled=true);}
+function removeChoices(){document.querySelectorAll('.choice').forEach(b=>b.remove());}
+
+function attemptRestore(routeId){
+  if(state.busy||state.gameOver)return;
+  state.busy=true;
+  const route=ROUTES.find(r=>r.id===routeId);
+  if(!route||!state.available.includes(routeId)){state.busy=false;return;}
+
+  addNarration(`<span class="highlight">${route.name}</span><br><span style="font-size:13px;color:var(--parchment-dark)">${route.sfrom} → ${route.sto}</span><br>${route.desc}`);
+
+  const reqEng=route.diff*14;
+  const reqFnd=route.diff*10;
+  if(state.eng<reqEng){
+    addNarration('Your engineering knowledge is insufficient. You need more experience — or better engineers.','marc');
+    state.busy=false;return;
+  }
+  if(state.fnd<reqFnd){
+    addNarration('The treasury refuses. Modern accountants have no vision. "We need to see a return on investment," they say. I\'ll show them a return — on a railway!','event');
+    state.busy=false;return;
+  }
+
+  const events=EVENTS[routeId];
+  if(events){
+    const evt=events[Math.floor(Math.random()*events.length)];
+    addNarration('⚑ '+evt.text,'event');
+    addChoices(evt.choices);
+    state.busy=false;return;
+  }
+  restoreRoute(routeId);
+}
+
+function restoreRoute(routeId){
+  const route=ROUTES.find(r=>r.id===routeId);
+  if(!route)return;
+  state.restored.push(routeId);
+  state.available=state.available.filter(r=>r!==routeId);
+  state.status[routeId]='live';
+
+  state.eng=clamp(state.eng+(route.reward.eng||0));
+  state.fnd=clamp(state.fnd+(route.reward.fnd||0));
+  state.pol=clamp(state.pol+(route.reward.pol||0));
+  state.mor=clamp(state.mor+(route.reward.mor||0));
+  updateStats();
+
+  addNarration(`<span class="highlight">⟡ ${route.name} RESTORED.</span><br>The line is open. Trains are running. A small piece of the nation is whole again.`, 'system');
+
+  const contempt=CONTEMPT[Math.floor(Math.random()*CONTEMPT.length)];
+  setTimeout(()=>addNarration(`<span class="contempt">BRUNEL:</span> ${contempt}`,'engineer'),500);
+
+  renderMap();
+  const panel=document.getElementById('map-panel');
+  const ach=document.createElement('div');
+  ach.className='achievement';
+  ach.textContent=`⟡ ${route.name} Reopened ⟡`;
+  panel.appendChild(ach);
+  setTimeout(()=>ach.remove(),4000);
+
+  state.busy=false;
+
+  // Check for engineer unlock
+  const nextEng=ENGINEERS.find(e=>e.unlock===state.restored.length);
+  if(nextEng && !state.engineers.find(e=>e.id===nextEng.id)){
+    setTimeout(()=>unlockEngineer(nextEng),600);
+  }
+
+  checkWin();
+  endTurn();
+}
+
+function unlockEngineer(eng){
+  state.engineers.push(eng);
+  state.eng=clamp(state.eng+(eng.bonus.eng||0));
+  state.fnd=clamp(state.fnd+(eng.bonus.fnd||0));
+  state.pol=clamp(state.pol+(eng.bonus.pol||0));
+  state.mor=clamp(state.mor+(eng.bonus.mor||0));
+  updateStats();
+
+  addNarration(`<span class="name">⟡ NEW ENGINEER RECRUITED ⟡</span><br>
+    <span class="highlight">${eng.emoji} ${eng.name}</span><br>
+    <em>${eng.desc}</em><br>
+    <span style="color:var(--aurora)">"${eng.quote}"</span>`, 'engineer');
+  updateEngineerList();
+}
+
+function endTurn(){
+  state.turn++;
+  document.getElementById('turnDisplay').textContent=`WEEK ${state.turn} · YEAR OF RESURRECTION 1`;
+
+  if(Math.random()<0.5 && !state.gameOver){
+    const evt=FREE_EVENTS[Math.floor(Math.random()*FREE_EVENTS.length)];
+    addNarration(evt.text,evt.type);
+    if(evt.effect){
+      state.eng=clamp(state.eng+(evt.effect.eng||0));
+      state.fnd=clamp(state.fnd+(evt.effect.fnd||0));
+      state.pol=clamp(state.pol+(evt.effect.pol||0));
+      state.mor=clamp(state.mor+(evt.effect.mor||0));
+      updateStats();
+    }
+  }
+
+  state.fnd=clamp(state.fnd-2);
+  state.pol=clamp(state.pol-1);
+  if(state.turn%3===0)state.mor=clamp(state.mor-1);
+  updateStats();
+  checkLose();
+
+  if(!state.gameOver && state.available.length>0){
+    addNarration('A new week. Choose a line. The iron waits.','system');
+  }
+}
+
+function checkWin(){
+  if(state.restored.length===ROUTES.length){
+    state.gameOver=true;
+    setTimeout(()=>{
+      document.getElementById('overlay').classList.add('active');
+      document.getElementById('overlay').innerHTML=`
+        <div class="vape-cloud">💨🏆💨</div>
+        <h2>⟡ THE NATION IS RECONNECTED ⟡</h2>
+        <p>Every severed line restored. Every lost station reopened. The Permanent Way is whole again.</p>
+        <p style="color:var(--brass-glow);font-size:22px;font-family:'Cinzel',serif">BRUNEL'S RESURRECTION IS COMPLETE</p>
+        <p>Completed in ${state.turn} weeks · ${state.engineers.length} engineers recruited</p>
+        <p style="font-style:italic;color:var(--ember)">The e-cig vapour clears. Brunel looks out over a Britain reconnected. For now.</p>
+        <button class="btn" onclick="location.reload()">BUILD AGAIN</button>
+      `;
+    },1500);
+  }
+}
+
+function checkLose(){
+  const dead=[];
+  if(state.eng<=0)dead.push('Engineering knowledge');
+  if(state.fnd<=0)dead.push('Funding');
+  if(state.pol<=0)dead.push('Political support');
+  if(state.mor<=0)dead.push('Public morale');
+  if(dead.length>0){
+    state.gameOver=true;
+    setTimeout(()=>{
+      document.getElementById('overlay').classList.add('active');
+      document.getElementById('overlay').innerHTML=`
+        <h2>⟡ THE WAY IS BROKEN ⟡</h2>
+        <p>${dead.join(', ')} has run out. Brunel stands at the HS2 breach, e-cig extinguished, staring into the darkness of modern Britain's infrastructure.</p>
+        <p style="color:var(--ember);font-size:20px;font-family:'Cinzel',serif">THE RESURRECTION HAS FAILED</p>
+        <p>${state.restored.length} of ${ROUTES.length} lines restored</p>
+        <p style="font-style:italic;color:var(--steel)">"Perhaps next century, my boy." — Marc Brunel's voice fades into the signal box mirror.</p>
+        <button class="btn" onclick="location.reload()">TRY AGAIN</button>
+      `;
+    },1500);
+  }
+}
+
+function startGame(){
+  state.started=true;
+  document.getElementById('overlay').classList.remove('active');
+
+  addNarration('The HS2 breach. A tunnel boring machine meets Victorian geometry. A portal opens. Brunel steps through — e-cig blazing, chest bare, furious.','system');
+  addNarration('<span class="contempt">BRUNEL takes a long drag. The vapour cloud forms the shape of a question mark. He exhales.</span> "This is an <strong>abomination</strong>."','engineer');
+  addNarration('Marc Brunel\'s voice echoes from the signal box mirror: "The Permanent Way is wounded, boy. Every abandoned alignment. Every rusted rail. They remember you. <em>Build.</em>"','marc');
+  addNarration(`<span style="color:var(--steel);font-size:13px">The railways of Britain — green for those that still run, red for those that were stolen by Beeching and his suits, orange for the heritage lines kept alive by volunteers and prayer.</span><br><br><span class="highlight">Choose a line. Restore it. Reconnect the nation.</span>`,'system');
+  renderMap();
+  updateStats();
+
+  const panel=document.getElementById('map-panel');
+  for(let i=0;i<25;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const s=1+Math.random()*2;
+    p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;bottom:${Math.random()*100}%;animation-duration:${10+Math.random()*20}s;animation-delay:${Math.random()*10}s`;
+    panel.appendChild(p);
+  }
+}
+
+renderMap();
+
+// ---------------------------------------------------------------------------
+// Voice & Portrait Integration — reads from localStorage written by the
+// Voice Studio (record.html) and Portrait Studio (portraits.html)
+// ---------------------------------------------------------------------------
+
+// Load face portrait
+let savedFace = null;
+(function loadSavedFace(){
+  const data = localStorage.getItem('tpw-face');
+  if (data) {
+    const img = new Image();
+    img.onload = () => { savedFace = img; };
+    img.src = data;
+  }
+})();
+
+// Load portrait configs
+let portraitConfigs = {};
+(function loadPortraitConfigs(){
+  try {
+    const saved = localStorage.getItem('tpw-portraits');
+    if (saved) portraitConfigs = JSON.parse(saved);
+  } catch(e) {}
+})();
+
+// Load recordings
+let recordings = {};
+(function loadRecordings(){
+  try {
+    const saved = localStorage.getItem('tpw-recordings');
+    if (saved) recordings = JSON.parse(saved);
+  } catch(e) {}
+})();
+
+// Override unlockEngineer to show portraits
+const _origUnlock = unlockEngineer;
+unlockEngineer = function(eng) {
+  _origUnlock(eng);
+
+  // Add portrait image to the narration
+  const panel = document.getElementById('narrative-panel');
+  const lastNarration = panel.querySelector('.narration:last-child');
+  if (!lastNarration) return;
+
+  const cfg = portraitConfigs[eng.id];
+  if (savedFace && cfg) {
+    // Draw the portrait to canvas and embed it
+    const c = document.createElement('canvas');
+    c.width = 120; c.height = 160;
+    c.style.cssText = 'width:120px;height:160px;border-radius:8px;border:2px solid var(--brass);margin-bottom:8px;display:block;';
+    const ctx = c.getContext('2d');
+    // Background
+    const grad = ctx.createRadialGradient(60, 50, 0, 60, 50, 80);
+    grad.addColorStop(0, '#1a2248'); grad.addColorStop(1, '#060a1e');
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, 120, 160);
+    // Border
+    ctx.strokeStyle = '#c9a84c'; ctx.lineWidth = 1;
+    ctx.strokeRect(2, 2, 116, 156);
+    // Face
+    const fcx = cfg.faceX / 100 * 120;
+    const fcy = cfg.faceY / 100 * 160;
+    const fs = cfg.faceScale / 100 * 26;
+    ctx.save();
+    ctx.beginPath(); ctx.ellipse(fcx, fcy, fs, fs*1.2, 0, 0, Math.PI*2); ctx.clip();
+    ctx.globalAlpha = (cfg.opacity||100) / 100;
+    ctx.drawImage(savedFace, fcx-fs, fcy-fs*1.2, fs*2, fs*2.4);
+    ctx.restore();
+    // Body detail for this engineer
+    if (eng.id === 'brunel') {
+      ctx.fillStyle = 'rgba(232,201,90,0.2)';
+      ctx.beginPath(); ctx.ellipse(100, 30, 30, 20, 0.5, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(110, 20, 20, 15, 0.7, 0, Math.PI*2); ctx.fill();
+    }
+    // Name
+    ctx.fillStyle = '#c9a84c'; ctx.font = '10px Cinzel,serif'; ctx.textAlign = 'center';
+    ctx.fillText(eng.name, 60, 154);
+
+    const portraitDiv = document.createElement('div');
+    portraitDiv.style.cssText = 'display:flex;justify-content:center;margin-bottom:8px;';
+    portraitDiv.appendChild(c);
+    lastNarration.insertBefore(portraitDiv, lastNarration.firstChild);
+  }
+
+  // Try playing voice clip
+  const lines = [
+    'brunel-5','stephenson-0','stephenson_r-0','hawkshaw-0','fowler-0','barlow-0'
+  ];
+  const key = lines[ENGINEERS.findIndex(e => e.id === eng.id)];
+  if (key >= 0) {
+    const recKey = Object.keys(recordings).find(k => k.startsWith(eng.id));
+    if (recKey && recordings[recKey]) {
+      const audio = new Audio(recordings[recKey]);
+      audio.volume = 0.8;
+      audio.play().catch(() => {});
+    }
+  }
+};
+
+// Re-check localStorage every 30s for new recordings
+setInterval(() => {
+  try {
+    const r = localStorage.getItem('tpw-recordings');
+    if (r) recordings = JSON.parse(r);
+    const p = localStorage.getItem('tpw-portraits');
+    if (p) portraitConfigs = JSON.parse(p);
+  } catch(e) {}
+}, 30000);
+</script>
+</body>
+</html>

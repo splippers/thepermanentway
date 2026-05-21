@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Permanent Way — Voice Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --brass:#c9a84c;--brass-glow:#e8c95a;--deep-navy:#0a0e27;
+  --dark-navy:#101838;--parchment:#f4e8c8;--parchment-dark:#d4c8a8;
+  --steel:#4a5568;--ember:#d45d3a;--aurora:#3a9d8c;--live:#22c55e;
+}
+body{
+  background:radial-gradient(ellipse at 50% 30%,#101838,#060a1a);
+  color:var(--parchment);font-family:'Cormorant Garamond',serif;
+  min-height:100vh;
+}
+header{
+  padding:20px 24px;
+  border-bottom:1px solid var(--brass);
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:12px;
+}
+header h1{font-family:'Cinzel',serif;font-size:20px;color:var(--brass);letter-spacing:3px;text-transform:uppercase}
+header .subtitle{font-style:italic;color:var(--steel);font-size:14px}
+.controls-bar{
+  padding:12px 24px;
+  background:rgba(0,0,0,0.3);
+  border-bottom:1px solid rgba(201,168,76,0.1);
+  display:flex;gap:16px;align-items:center;flex-wrap:wrap;
+}
+.controls-bar label{font-size:13px;color:var(--steel)}
+.controls-bar select{
+  background:rgba(10,14,39,0.8);border:1px solid var(--brass);border-radius:4px;
+  color:var(--parchment);padding:6px 12px;font-family:'Cormorant Garamond',serif;font-size:14px;
+}
+.controls-bar .stats{font-size:13px;color:var(--steel);margin-left:auto}
+.controls-bar .stats span{color:var(--brass);font-weight:700}
+.actor-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;
+}
+.actor-jon{background:rgba(232,201,90,0.15);border:1px solid rgba(232,201,90,0.3);color:var(--brass-glow)}
+.actor-wife{background:rgba(58,157,140,0.15);border:1px solid rgba(58,157,140,0.3);color:var(--aurora)}
+.lines-container{
+  max-width:900px;margin:0 auto;padding:20px 24px 60px;
+}
+.engineer-group{margin-bottom:24px}
+.engineer-group h2{
+  font-family:'Cinzel',serif;font-size:16px;color:var(--brass-glow);
+  padding:8px 12px;margin-bottom:8px;
+  border-bottom:1px solid rgba(232,201,90,0.2);
+  display:flex;align-items:center;gap:8px;
+}
+.engineer-group h2 .count{font-size:12px;color:var(--steel);font-family:'Cormorant Garamond',serif}
+.line-card{
+  display:flex;align-items:center;gap:12px;
+  padding:8px 12px;margin-bottom:4px;
+  background:rgba(0,0,0,0.2);
+  border:1px solid rgba(201,168,76,0.1);
+  border-radius:6px;
+  transition:all 0.2s;
+}
+.line-card:hover{border-color:rgba(201,168,76,0.3)}
+.line-card .index{font-size:11px;color:var(--steel);width:24px;flex-shrink:0;text-align:right}
+.line-card .text{flex:1;font-size:14px;line-height:1.4;min-width:0}
+.line-card .text .contempt{color:var(--ember);font-style:italic}
+.line-card .text .actor{font-size:11px;color:var(--steel);margin-top:2px}
+.line-card .actions{display:flex;gap:6px;flex-shrink:0}
+.line-card .actions button{
+  width:36px;height:36px;border-radius:50%;border:1px solid var(--brass);
+  background:rgba(10,14,39,0.6);color:var(--brass);
+  cursor:pointer;font-size:16px;transition:all 0.2s;
+  display:flex;align-items:center;justify-content:center;
+}
+.line-card .actions button:hover{background:rgba(201,168,76,0.2)}
+.line-card .actions button.recording{background:var(--blood);border-color:var(--ember);color:white;animation:pulse 0.8s infinite}
+.line-card .actions button.done{background:rgba(34,197,94,0.2);border-color:var(--live);color:var(--live)}
+.line-card .actions button.play{background:rgba(232,201,90,0.1);border-color:var(--brass-glow);color:var(--brass-glow)}
+.line-card .status-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+}
+.line-card .status-dot.pending{background:var(--steel)}
+.line-card .status-dot.recorded{background:var(--live)}
+.line-card .status-dot.recording{background:var(--ember);animation:pulse 0.8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+#face-upload-area{
+  padding:12px 24px;
+  background:rgba(0,0,0,0.25);
+  border-bottom:1px solid rgba(201,168,76,0.1);
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+#face-upload-area label{font-size:13px;color:var(--steel)}
+#face-upload-area input[type=file]{
+  background:rgba(10,14,39,0.8);border:1px solid var(--brass);border-radius:4px;
+  color:var(--parchment);padding:4px 8px;font-size:12px;
+}
+.face-preview{width:40px;height:40px;border-radius:50%;border:2px solid var(--brass);object-fit:cover}
+.face-preview-placeholder{width:40px;height:40px;border-radius:50%;border:2px dashed var(--steel);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--steel)}
+select option{background:var(--deep-navy);color:var(--parchment)}
+#global-export{
+  padding:12px 24px;background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(201,168,76,0.1);
+  display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+}
+#global-export button{
+  padding:8px 20px;background:transparent;border:2px solid var(--brass);
+  color:var(--brass);font-family:'Cinzel',serif;font-size:12px;
+  cursor:pointer;letter-spacing:2px;text-transform:uppercase;transition:all 0.3s;
+}
+#global-export button:hover{background:var(--brass);color:var(--deep-navy)}
+#global-export .hint{font-size:12px;color:var(--steel);font-style:italic}
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  padding:10px 24px;background:rgba(10,14,39,0.95);
+  border:1px solid var(--brass);border-radius:6px;
+  color:var(--brass);font-family:'Cinzel',serif;font-size:13px;
+  z-index:100;animation:fadeIn 0.3s;
+  display:none;
+}
+.toast.show{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⟡ The Permanent Way — Voice Studio</h1>
+  <span class="subtitle">"Speak, and the iron remembers"</span>
+</header>
+
+<div id="face-upload-area">
+  <label>Your face for the beefcakes:</label>
+  <input type="file" id="faceUpload" accept="image/*">
+  <div id="facePreview" class="face-preview-placeholder">📷</div>
+  <span style="font-size:12px;color:var(--steel)">Upload a front-facing portrait — it will be composited onto each engineer's body</span>
+</div>
+
+<div class="controls-bar">
+  <label>Filter by engineer:</label>
+  <select id="engineerFilter"><option value="all">All Engineers</option></select>
+  <label>Status:</label>
+  <select id="statusFilter">
+    <option value="all">All Lines</option>
+    <option value="pending">Pending Only</option>
+    <option value="recorded">Recorded Only</option>
+  </select>
+  <div class="stats">Recorded: <span id="recordedCount">0</span> / <span id="totalCount">0</span></div>
+</div>
+
+<div id="global-export">
+  <button id="exportAllBtn">📦 Export All Recordings</button>
+  <button id="clearAllBtn">🗑️ Clear All</button>
+  <span class="hint">Recordings are stored in your browser. Export to download as files.</span>
+</div>
+
+<div class="lines-container" id="linesContainer"></div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const ENGINEERS = [
+  {id:'brunel',name:'Isambard "The King" Brunel',emoji:'💨',actor:'Jon',color:'var(--brass-glow)'},
+  {id:'stephenson',name:'George "Rocket" Stephenson',emoji:'🔥',actor:'Jon',color:'#ff8c42'},
+  {id:'stephenson_r',name:'Robert Stephenson',emoji:'🏛️',actor:'Jon',color:'#6b8cce'},
+  {id:'hawkshaw',name:'Sir John "Viaduct" Hawkshaw',emoji:'🌉',actor:'Wife',color:'#4ac9a4'},
+  {id:'fowler',name:'Sir John "Forth" Fowler',emoji:'🏗️',actor:'Wife',color:'#c084fc'},
+  {id:'barlow',name:'William "Bold" Barlow',emoji:'⚡',actor:'Wife',color:'#f97316'},
+  {id:'marc',name:'Marc Brunel',emoji:'👻',actor:'Wife',color:'var(--ember)'},
+  {id:'system',name:'Narrator',emoji:'📜',actor:'Jon',color:'var(--aurora)'},
+];
+
+const SCRIPT_LINES = [
+  // BRUNEL
+  {eng:'brunel',text:'"This gradient is an insult to God and Isambard!"',context:'inspecting a modern railway alignment',actor:'Jon'},
+  {eng:'brunel',text:'"A \\u201Cbusiness case\\u201D? I am Isambard Kingdom Brunel. My business case is three cigar stubs and a napkin sketch."',context:'first encounter with a project manager',actor:'Jon'},
+  {eng:'brunel',text:'"You have \\u201Cproject managers\\u201D? In my day, we had \\u201Cengineers\\u201D. They were the same person."',context:'dismissing modern job titles',actor:'Jon'},
+  {eng:'brunel',text:'"Spreadsheets. Spreadsheets everywhere. I built the Great Western Railway with a slide rule and pure contempt for the impossible."',context:'seeing a modern office',actor:'Jon'},
+  {eng:'brunel',text:'"This \\u201CRisk Register\\u201D appears to be a list of things you\\u2019re too timid to attempt."',context:'being handed a risk register',actor:'Jon'},
+  {eng:'brunel',text:'"I once designed a bridge, a tunnel, and a steamship between breakfast and luncheon. What have you done today?"',context:'recruited speech',actor:'Jon'},
+  {eng:'brunel',text:'"HS2 has a \\u201Cstakeholder engagement lead.\\u201D I had a horse. The horse was more useful."',context:'reading the news',actor:'Jon'},
+  {eng:'brunel',text:'"You don\\u2019t need a \\u201Ctransport strategy.\\u201D You need six months of hard labour and a proper engineer. I\\u2019m available."',context:'final speech before a big project',actor:'Jon'},
+  {eng:'brunel',text:'"Sustainability targets? The Great Western Railway is STILL RUNNING 180 years later. THAT is sustainability. Your net zero strategy is a PowerPoint."',context:'dismissing modern ESG',actor:'Jon'},
+  {eng:'brunel',text:'"I have been dead 170 years and I can still build a better railway than your entire consulting industry combined. Let that sink in."',context:'triumphant restoration speech',actor:'Jon'},
+  {eng:'brunel',text:'"This train has a \\u201Csilent carriage.\\u201D In my day, every carriage was silent \\u2014 because we built them properly and you could hear yourself think."',context:'inspecting modern rolling stock',actor:'Jon'},
+  {eng:'brunel',text:'"You\\u2019ve \\u201Cmarket tested\\u201D the gradient? The gradient is not a marketing exercise. The gradient is a conversation between the engine and the earth."',context:'being shown a feasibility study',actor:'Jon'},
+  {eng:'brunel',text:'"This document is 400 pages long and contains not a single drawing of a bridge. I despair for your species."',context:'holding a modern planning document',actor:'Jon'},
+  {eng:'brunel',text:'"You hold \\u201Cworkshops\\u201D to decide things. I held a compass and a straight edge. The compass never asked for everyone\\u2019s opinion."',context:'before a stakeholder meeting',actor:'Jon'},
+
+  // GEORGE STEPHENSON
+  {eng:'stephenson',text:'"Ye call that a rail? I\\u2019ve seen stronger cheese. And I LIKE cheese. But I wouldn\\u2019t build a railway on it."',context:'looking at modern steel',actor:'Jon'},
+  {eng:'stephenson',text:'"When I built the Rocket, I didn\\u2019t have a \\u201Cproject charter.\\u201D I had a hammer, some coal, and an idea that wouldn\\u2019t let me sleep."',context:'recruited speech',actor:'Jon'},
+  {eng:'stephenson',text:'"Electric trains? Aye, they\\u2019re grand. But where\\u2019s the FIRE? Where\\u2019s the NOISE? A railway should announce itself."',context:'seeing an electric train',actor:'Jon'},
+  {eng:'stephenson',text:'"They told me a railway would never work at more than 30 miles per hour. I told them the human body could handle it. I was right. I\\u2019m always right."',context:'triumphant',actor:'Jon'},
+
+  // ROBERT STEPHENSON
+  {eng:'stephenson_r',text:'"My father built the Rocket. I built the Britannia Bridge. You built a risk register. Let us not speak of it further."',context:'recruited speech',actor:'Jon'},
+  {eng:'stephenson_r',text:'"I designed the Victoria Bridge in Montreal. It still stands. The paperwork for modern bridge approvals would fill the St. Lawrence."',context:'comparing eras',actor:'Jon'},
+  {eng:'stephenson_r',text:'"There is no problem in engineering that cannot be solved by a sufficiently large tube of rivets and the will to apply them."',context:'philosophical moment',actor:'Jon'},
+
+  // HAWKSHAW
+  {eng:'hawkshaw',text:'"My bridges stand for centuries. Your \\u201Cstakeholder engagement framework\\u201D will not."',context:'recruited speech',actor:'Wife'},
+  {eng:'hawkshaw',text:'"I built the Severn Tunnel by glaring at the river until it moved. That is what engineering looks like when it has conviction."',context:'reminiscing',actor:'Wife'},
+  {eng:'hawkshaw',text:'"\\u201CGround investigation\\u201D? My dear fellow, I can tell you what the earth is made of by tasting it. That\\u2019s an investigation."',context:'dismissing modern site surveys',actor:'Wife'},
+
+  // FOWLER
+  {eng:'fowler',text:'"I built the Forth Bridge. You built a Trello board. We are not the same."',context:'recruited speech',actor:'Wife'},
+  {eng:'fowler',text:'"The Forth Bridge took 54,000 tons of steel. Your entire office weighs less than a single span. I find that... disappointing."',context:'looking at modern architecture',actor:'Wife'},
+  {eng:'fowler',text:'"A \\u201Cstaged gate review\\u201D? We had a gate. It was made of iron. We reviewed it by walking through it. That was the review."',context:'dismissing governance',actor:'Wife'},
+
+  // BARLOW
+  {eng:'barlow',text:'"You have never drawn a stress diagram in your LIFE, have you? That is not a rhetorical question. I can see it in your eyes."',context:'recruited speech',actor:'Wife'},
+  {eng:'barlow',text:'"I invented the Barlow rail while fighting a duel. On a train. THAT I ALSO DESIGNED. What have you done while commuting?"',context:'grandstanding',actor:'Wife'},
+  {eng:'barlow',text:'"You call this a specification? I\\u2019ve seen longer grocery lists. My housekeeper is more thorough."',context:'reviewing modern engineering specs',actor:'Wife'},
+
+  // MARC BRUNEL
+  {eng:'marc',text:'"The line remembers you, Isambard. Feel it in your boots. The iron sings when you\\u2019re near it."',context:'ghostly appearance',actor:'Wife'},
+  {eng:'marc',text:'"The gradient is wrong in the Severn approach. I\\u2019d fix it myself but I\\u2019m dead, you useless boy."',context:'chiding from the underworld',actor:'Wife'},
+  {eng:'marc',text:'"Maybe next century, my boy."',context:'on failure',actor:'Wife'},
+
+  // NARRATOR (for free events)
+  {eng:'system',text:'The HS2 breach. A tunnel boring machine meets Victorian geometry. A portal opens. Brunel steps through \\u2014 e-cig blazing.',context:'game opening',actor:'Jon'},
+  {eng:'system',text:'Network Rail sends a feasibility study team. They have clipboards. They have risk matrices. They have no idea what they\\u2019re doing.',context:'event narration',actor:'Jon'},
+  {eng:'system',text:'A Productivity Consultant arrives to optimise the workforce. He uses words like synergy and touch base.',context:'event narration',actor:'Jon'},
+  {eng:'system',text:'A stakeholder workshop is scheduled. The attendees include three councillors, two activists, a poet, and a cycling advocate.',context:'event narration',actor:'Jon'},
+];
+
+// State
+let recordings = JSON.parse(localStorage.getItem('tpw-recordings') || '{}');
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function populateFilter(){
+  const sel=document.getElementById('engineerFilter');
+  ENGINEERS.forEach(e=>{
+    const o=document.createElement('option');
+    o.value=e.id;o.textContent=`${e.emoji} ${e.name} (${e.actor})`;
+    sel.appendChild(o);
+  });
+}
+
+function renderLines(){
+  const container=document.getElementById('linesContainer');
+  const engFilter=document.getElementById('engineerFilter').value;
+  const statusFilter=document.getElementById('statusFilter').value;
+
+  let filtered=[...SCRIPT_LINES];
+  if(engFilter!=='all')filtered=filtered.filter(l=>l.eng===engFilter);
+  if(statusFilter==='pending')filtered=filtered.filter(l=>!recordings[lineKey(l)]);
+  if(statusFilter==='recorded')filtered=filtered.filter(l=>recordings[lineKey(l)]);
+
+  // Group by engineer
+  const groups={};
+  filtered.forEach(l=>{
+    if(!groups[l.eng])groups[l.eng]=[];
+    groups[l.eng].push(l);
+  });
+
+  container.innerHTML='';
+  Object.entries(groups).forEach(([engId,lines])=>{
+    const eng=ENGINEERS.find(e=>e.id===engId);
+    if(!eng)return;
+    const total=SCRIPT_LINES.filter(l=>l.eng===engId).length;
+    const done=SCRIPT_LINES.filter(l=>l.eng===engId && recordings[lineKey(l)]).length;
+
+    const group=document.createElement('div');
+    group.className='engineer-group';
+    group.innerHTML=`<h2>${eng.emoji} ${eng.name} <span class="count">(${done}/${total} recorded) <span class="actor-badge ${eng.actor==='Jon'?'actor-jon':'actor-wife'}">${eng.actor}</span></span></h2>`;
+
+    lines.forEach((line,i)=>{
+      const key=lineKey(line);
+      const rec=recordings[key];
+      const card=document.createElement('div');
+      card.className='line-card';
+
+      const statusDot=document.createElement('div');
+      statusDot.className=`status-dot ${rec?'recorded':'pending'}`;
+
+      const idx=document.createElement('div');
+      idx.className='index';idx.textContent=i+1;
+
+      const textDiv=document.createElement('div');
+      textDiv.className='text';
+      textDiv.innerHTML=`<div>${line.text}</div><div class="actor"><em>${line.context}</em> \\u2014 ${line.actor}</div>`;
+
+      const actions=document.createElement('div');
+      actions.className='actions';
+
+      const recordBtn=document.createElement('button');
+      recordBtn.innerHTML=rec?'\\u2713':'\\u25CF';
+      recordBtn.className=rec?'done':'';
+      recordBtn.title=rec?'Re-record':'Record';
+      recordBtn.onclick=()=>startRecording(line,card,recordBtn,statusDot);
+
+      const playBtn=document.createElement('button');
+      playBtn.innerHTML='\\u25B6';
+      playBtn.className='play';
+      playBtn.title='Play recording';
+      playBtn.style.display=rec?'flex':'none';
+      playBtn.onclick=()=>playRecording(key);
+
+      actions.appendChild(recordBtn);
+      actions.appendChild(playBtn);
+      card.appendChild(statusDot);
+      card.appendChild(idx);
+      card.appendChild(textDiv);
+      card.appendChild(actions);
+      group.appendChild(card);
+    });
+
+    container.appendChild(group);
+  });
+
+  updateCounts();
+}
+
+function lineKey(line){
+  const idx=SCRIPT_LINES.indexOf(line);
+  return `${line.eng}-${idx}`;
+}
+
+async function startRecording(line,card,btn,statusDot){
+  if(!navigator.mediaDevices?.getUserMedia){
+    toast('Recording not supported in this browser');return;
+  }
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    const mediaRecorder=new MediaRecorder(stream);
+    const chunks=[];
+
+    btn.innerHTML='\\u25A0';
+    btn.className='recording';
+    statusDot.className='status-dot recording';
+
+    mediaRecorder.ondataavailable=e=>chunks.push(e.data);
+    mediaRecorder.onstop=()=>{
+      const blob=new Blob(chunks,{type:'audio/webm'});
+      const key=lineKey(line);
+      recordings[key]=URL.createObjectURL(blob);
+      localStorage.setItem('tpw-recordings',JSON.stringify(
+        Object.fromEntries(Object.entries(recordings).map(([k,v])=>[k,v.startsWith('blob:')?URL.createObjectURL(new Blob([v],{type:'audio/webm'})):v]))
+      ));
+      // Actually store the blob as data URL for persistence
+      const reader=new FileReader();
+      reader.onloadend=()=>{
+        recordings[key]=reader.result;
+        localStorage.setItem('tpw-recordings',JSON.stringify(recordings));
+        btn.innerHTML='\\u2713';
+        btn.className='done';
+        statusDot.className='status-dot recorded';
+        card.querySelector('.play').style.display='flex';
+        toast('Recorded!');
+      };
+      reader.readAsDataURL(blob);
+      stream.getTracks().forEach(t=>t.stop());
+    };
+
+    mediaRecorder.start();
+    // Stop after 10 seconds max, or tap button again
+    setTimeout(()=>{
+      if(mediaRecorder.state==='recording')mediaRecorder.stop();
+    },10000);
+    btn.onclick=()=>{
+      if(mediaRecorder.state==='recording')mediaRecorder.stop();
+    };
+  }catch(e){
+    toast('Microphone access denied');console.error(e);
+  }
+}
+
+function playRecording(key){
+  const data=recordings[key];
+  if(!data)return;
+  const audio=new Audio(data);
+  audio.play().catch(()=>toast('Could not play recording'));
+}
+
+function updateCounts(){
+  const total=SCRIPT_LINES.length;
+  const done=SCRIPT_LINES.filter(l=>recordings[lineKey(l)]).length;
+  document.getElementById('recordedCount').textContent=done;
+  document.getElementById('totalCount').textContent=total;
+}
+
+function exportAll(){
+  let count=0;
+  SCRIPT_LINES.forEach(line=>{
+    const key=lineKey(line);
+    const data=recordings[key];
+    if(!data)return;
+    // Convert data URL to blob and download
+    fetch(data).then(r=>r.blob()).then(blob=>{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download=`tpw-${key}.webm`;
+      a.click();
+      count++;
+    });
+  });
+  setTimeout(()=>toast(`Exporting ${count} recordings...`),500);
+}
+
+function clearAll(){
+  if(!confirm('Clear ALL recordings? This cannot be undone.'))return;
+  recordings={};
+  localStorage.removeItem('tpw-recordings');
+  renderLines();
+  toast('All recordings cleared');
+}
+
+// Face upload
+document.getElementById('faceUpload').addEventListener('change',function(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onloadend=function(){
+    const dataUrl=reader.result;
+    localStorage.setItem('tpw-face',dataUrl);
+    document.getElementById('facePreview').innerHTML=`<img src="${dataUrl}" class="face-preview">`;
+    toast('Face saved! It will appear on your engineers.');
+  };
+  reader.readAsDataURL(file);
+});
+
+// Load saved face
+(function(){
+  const savedFace=localStorage.getItem('tpw-face');
+  if(savedFace){
+    document.getElementById('facePreview').innerHTML=`<img src="${savedFace}" class="face-preview">`;
+  }
+})();
+
+document.getElementById('engineerFilter').addEventListener('change',renderLines);
+document.getElementById('statusFilter').addEventListener('change',renderLines);
+document.getElementById('exportAllBtn').addEventListener('click',exportAll);
+document.getElementById('clearAllBtn').addEventListener('click',clearAll);
+
+populateFilter();
+renderLines();
+</script>
+</body>
+</html>

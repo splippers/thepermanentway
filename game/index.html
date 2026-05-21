@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Permanent Way — Game Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:radial-gradient(ellipse at 50% 30%,#101838,#060a1a);
+  color:#f4e8c8;font-family:'Cormorant Garamond',serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;
+}
+h1{font-family:'Cinzel',serif;font-size:32px;color:#c9a84c;text-shadow:0 0 40px rgba(201,168,76,0.3);margin-bottom:8px;text-align:center;letter-spacing:4px;text-transform:uppercase}
+.subtitle{font-style:italic;color:#4a5568;font-size:16px;margin-bottom:32px;text-align:center}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;max-width:900px;width:100%}
+.card{
+  background:rgba(0,0,0,0.3);border:1px solid rgba(201,168,76,0.2);
+  border-radius:8px;padding:24px;text-align:center;
+  transition:all 0.3s;cursor:pointer;text-decoration:none;color:inherit;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.card:hover{border-color:#c9a84c;transform:translateY(-4px);background:rgba(201,168,76,0.05)}
+.card .icon{font-size:40px}
+.card .title{font-family:'Cinzel',serif;font-size:18px;color:#c9a84c}
+.card .desc{font-size:14px;color:#8a7a5a;line-height:1.4}
+.card .status{font-size:11px;padding:4px 12px;border-radius:12px;margin-top:4px}
+.status-live{background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3)}
+.status-new{background:rgba(232,201,90,0.15);color:#e8c95a;border:1px solid rgba(232,201,90,0.3)}
+.status-wip{background:rgba(243,118,22,0.15);color:#f97316;border:1px solid rgba(243,118,22,0.3)}
+footer{margin-top:40px;font-size:12px;color:#4a5568;text-align:center}
+footer a{color:#c9a84c;text-decoration:none}
+</style>
+</head>
+<body>
+  <h1>⟡ The Permanent Way</h1>
+  <p class="subtitle">The Resurrection is underway</p>
+  <div class="cards">
+    <a href="game.html" class="card">
+      <div class="icon">🚂</div>
+      <div class="title">The Game</div>
+      <div class="desc">Restore Britain's railways as a resurrected, furious Brunel</div>
+      <div class="status status-live">🟢 Playable</div>
+    </a>
+    <a href="record.html" class="card">
+      <div class="icon">🎙️</div>
+      <div class="title">Voice Studio</div>
+      <div class="desc">Record character voices for all engineers</div>
+      <div class="status status-new">✨ Record</div>
+    </a>
+    <a href="portraits.html" class="card">
+      <div class="icon">🖼️</div>
+      <div class="title">Portrait Studio</div>
+      <div class="desc">Map your face onto each Victorian beefcake body</div>
+      <div class="status status-new">✨ Configure</div>
+    </a>
+  </div>
+  <footer>
+    <p>Built with contempt for modern project management</p>
+    <p><a href="https://skynet.thepermanentway.uk">skynet.thepermanentway.uk</a></p>
+  </footer>
+</body>
+</html>

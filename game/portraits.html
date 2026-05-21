@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Permanent Way — Portrait Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --brass:#c9a84c;--brass-glow:#e8c95a;--deep-navy:#0a0e27;
+  --dark-navy:#101838;--parchment:#f4e8c8;--parchment-dark:#d4c8a8;
+  --steel:#4a5568;--ember:#d45d3a;--aurora:#3a9d8c;
+}
+body{
+  background:radial-gradient(ellipse at 50% 30%,#101838,#060a1a);
+  color:var(--parchment);font-family:'Cormorant Garamond',serif;
+  min-height:100vh;
+}
+header{
+  padding:20px 24px;border-bottom:1px solid var(--brass);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+}
+header h1{font-family:'Cinzel',serif;font-size:20px;color:var(--brass);letter-spacing:3px;text-transform:uppercase}
+header .subtitle{font-style:italic;color:var(--steel);font-size:14px}
+.upload-bar{
+  padding:12px 24px;background:rgba(0,0,0,0.3);
+  border-bottom:1px solid rgba(201,168,76,0.1);
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.upload-bar label{font-size:13px;color:var(--steel)}
+.upload-bar input[type=file]{background:rgba(10,14,39,0.8);border:1px solid var(--brass);border-radius:4px;color:var(--parchment);padding:4px 8px;font-size:12px}
+.drag-hint{font-size:11px;color:var(--steel);font-style:italic}
+.engineer-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:16px;padding:20px 24px;max-width:1200px;margin:0 auto;
+}
+.engineer-card{
+  background:rgba(0,0,0,0.3);border:1px solid rgba(201,168,76,0.2);
+  border-radius:8px;overflow:hidden;transition:all 0.3s;
+}
+.engineer-card:hover{border-color:var(--brass)}
+.engineer-card .card-header{
+  padding:10px 12px;
+  border-bottom:1px solid rgba(201,168,76,0.1);
+  display:flex;align-items:center;gap:8px;
+}
+.engineer-card .card-header .name{font-family:'Cinzel',serif;font-size:14px;color:var(--brass-glow)}
+.engineer-card .card-header .actor{font-size:11px;padding:2px 6px;border-radius:8px;}
+.actor-jon{background:rgba(232,201,90,0.15);color:var(--brass-glow)}
+.actor-wife{background:rgba(58,157,140,0.15);color:var(--aurora)}
+.portrait-canvas-wrap{
+  position:relative;width:100%;aspect-ratio:3/4;
+  background:#060a1a;overflow:hidden;
+}
+.portrait-canvas-wrap canvas{width:100%;height:100%;display:block}
+.portrait-controls{padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.portrait-controls label{font-size:11px;color:var(--steel);grid-column:1/3}
+.portrait-controls input[type=range]{width:100%}
+.portrait-controls .value{font-size:10px;color:var(--brass);text-align:right}
+.face-source{display:flex;gap:6px;padding:0 12px 10px;flex-wrap:wrap}
+.face-source button{
+  flex:1;padding:4px 8px;font-size:11px;
+  background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);
+  color:var(--parchment);border-radius:4px;cursor:pointer;font-family:'Cormorant Garamond',serif;
+  transition:all 0.2s;
+}
+.face-source button:hover{background:rgba(201,168,76,0.2)}
+.face-source button.active{background:rgba(201,168,76,0.3);border-color:var(--brass)}
+.body-style{display:flex;gap:4px;padding:0 12px 10px;flex-wrap:wrap}
+.body-style button{
+  flex:1;padding:4px;font-size:10px;
+  background:rgba(10,14,39,0.6);border:1px solid rgba(201,168,76,0.15);
+  color:var(--steel);border-radius:4px;cursor:pointer;transition:all 0.2s;
+}
+.body-style button:hover{border-color:var(--brass);color:var(--parchment)}
+.body-style button.active{border-color:var(--brass);color:var(--brass);background:rgba(201,168,76,0.1)}
+.controls-actions{
+  padding:12px 24px;display:flex;gap:12px;
+  border-top:1px solid rgba(201,168,76,0.1);
+  background:rgba(0,0,0,0.2);
+  justify-content:center;
+}
+.controls-actions button{
+  padding:8px 24px;background:transparent;border:2px solid var(--brass);
+  color:var(--brass);font-family:'Cinzel',serif;font-size:12px;
+  cursor:pointer;letter-spacing:2px;text-transform:uppercase;transition:all 0.3s;
+}
+.controls-actions button:hover{background:var(--brass);color:var(--deep-navy)}
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  padding:10px 24px;background:rgba(10,14,39,0.95);
+  border:1px solid var(--brass);border-radius:6px;
+  color:var(--brass);font-family:'Cinzel',serif;font-size:13px;
+  z-index:100;animation:fadeIn 0.3s;display:none;
+}
+.toast.show{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⟡ Portrait Studio</h1>
+  <span class="subtitle">Your face. Their bodies. Victorian miracles.</span>
+</header>
+
+<div class="upload-bar">
+  <label>Your face:</label>
+  <input type="file" id="faceUpload" accept="image/*">
+  <span class="drag-hint">Upload a front-facing, well-lit portrait for best results</span>
+</div>
+
+<div class="engineer-grid" id="engineerGrid"></div>
+
+<div class="controls-actions">
+  <button id="saveAllBtn">💾 Save All Portraits</button>
+  <button id="resetAllBtn">↺ Reset All</button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const ENGINEERS = [
+  {id:'brunel',name:'Brunel',emoji:'💨',actor:'Jon',body:'torn-blouse',desc:'E-cig. Ripped shirt. Chest hair. Absolute contempt.'},
+  {id:'stephenson',name:'G. Stephenson',emoji:'🔥',actor:'Jon',body:'flat-cap',desc:'Barrel chest. Muttonchops. Flat cap. Northern fury.'},
+  {id:'stephenson_r',name:'R. Stephenson',emoji:'🏛️',actor:'Jon',body:'waistcoat',desc:'Sideburns. Waistcoat. Chiselled. Polite. Deadly.'},
+  {id:'hawkshaw',name:'Hawkshaw',emoji:'🌉',actor:'Wife',body:'beard',desc:'Beard. Viaducts. Stare that judges your soul.'},
+  {id:'fowler',name:'Fowler',emoji:'🏗️',actor:'Wife',body:'top-hat',desc:'Top hat. Monocle. Shoulders like a tunnel bore.'},
+  {id:'barlow',name:'Barlow',emoji:'⚡',actor:'Wife',body:'wing-collar',desc:'Collar straining. Eyebrows furious. Stress diagrams.'},
+];
+
+const BODY_STYLES = {
+  'torn-blouse': {hat:0, chest:true, shoulders:'broad', faceY:0.12, faceH:0.2},
+  'flat-cap': {hat:1, chest:true, shoulders:'broad', faceY:0.13, faceH:0.19},
+  'waistcoat': {hat:0, chest:true, shoulders:'athletic', faceY:0.12, faceH:0.2},
+  'beard': {hat:0, chest:false, shoulders:'broad', faceY:0.14, faceH:0.18},
+  'top-hat': {hat:2, chest:true, shoulders:'massive', faceY:0.10, faceH:0.18},
+  'wing-collar': {hat:0, chest:true, shoulders:'athletic', faceY:0.12, faceH:0.2},
+};
+
+// State
+let faceImage = null;
+let configs = JSON.parse(localStorage.getItem('tpw-portraits') || '{}');
+
+// Initialize defaults
+ENGINEERS.forEach(e => {
+  if (!configs[e.id]) {
+    const bs = BODY_STYLES[e.body];
+    configs[e.id] = {
+      faceX: 50, faceY: 50, faceScale: 100,
+      bodyStyle: e.body, opacity: 100,
+    };
+  }
+});
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function drawEngineer(engId) {
+  const eng = ENGINEERS.find(e => e.id === engId);
+  if (!eng) return;
+  const cfg = configs[engId];
+  const canvas = document.getElementById(`canvas-${engId}`);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Background
+  const grad = ctx.createRadialGradient(w/2, h*0.3, 0, w/2, h*0.3, w*0.7);
+  grad.addColorStop(0, '#1a2248');
+  grad.addColorStop(1, '#060a1e');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+
+  // Victorian border/frame
+  ctx.strokeStyle = '#c9a84c';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(4, 4, w-8, h-8);
+  
+  // Inner decorative border
+  ctx.strokeStyle = 'rgba(201,168,76,0.3)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(10, 10, w-20, h-20);
+
+  // Body silhouette (Victorian torso outline)
+  const cx = w/2, bodyTop = h * 0.35;
+  ctx.fillStyle = '#0a0e27';
+  ctx.strokeStyle = '#c9a84c';
+  ctx.lineWidth = 2;
+  
+  // Shoulders
+  const shoulderW = cfg.bodyStyle === 'massive' ? w*0.45 : cfg.bodyStyle === 'broad' ? w*0.42 : w*0.38;
+  ctx.beginPath();
+  ctx.moveTo(cx - shoulderW, bodyTop + h*0.55);
+  ctx.quadraticCurveTo(cx - shoulderW, bodyTop + h*0.1, cx - w*0.25, bodyTop - h*0.02);
+  ctx.lineTo(cx + w*0.25, bodyTop - h*0.02);
+  ctx.quadraticCurveTo(cx + shoulderW, bodyTop + h*0.1, cx + shoulderW, bodyTop + h*0.55);
+  ctx.stroke();
+
+  // Chest muscles (for beefcake)
+  if (cfg.bodyStyle !== 'beard') {
+    ctx.fillStyle = 'rgba(201,168,76,0.08)';
+    // Pecs
+    ctx.beginPath();
+    ctx.ellipse(cx - w*0.1, bodyTop + h*0.2, w*0.09, h*0.08, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(cx + w*0.1, bodyTop + h*0.2, w*0.09, h*0.08, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.stroke();
+    // Abs
+    for (let i = 0; i < 4; i++) {
+      ctx.strokeRect(cx - w*0.04, bodyTop + h*0.28 + i*h*0.04, w*0.08, h*0.035);
+    }
+  }
+
+  // Costume detail: torn blouse
+  if (cfg.bodyStyle === 'torn-blouse') {
+    ctx.strokeStyle = '#4a2a1a';
+    ctx.lineWidth = 1;
+    // Ripped edges
+    for (let i = 0; i < 8; i++) {
+      const rx = cx - w*0.2 + i * (w*0.4/7);
+      const ry = bodyTop - h*0.02 + Math.sin(i*1.5)*h*0.03;
+      ctx.beginPath();
+      ctx.moveTo(rx, ry);
+      ctx.lineTo(rx + Math.random()*10-5, ry + h*0.05);
+      ctx.stroke();
+    }
+  }
+
+  // Hat
+  if (cfg.bodyStyle === 'flat-cap') {
+    ctx.fillStyle = '#2a1a0a';
+    ctx.beginPath();
+    ctx.ellipse(cx, bodyTop - h*0.1, w*0.15, h*0.04, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(cx, bodyTop - h*0.12, w*0.1, h*0.05, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.stroke();
+  } else if (cfg.bodyStyle === 'top-hat') {
+    ctx.fillStyle = '#1a1a2a';
+    ctx.fillRect(cx - w*0.06, bodyTop - h*0.28, w*0.12, h*0.18);
+    ctx.fillRect(cx - w*0.12, bodyTop - h*0.10, w*0.24, h*0.025);
+    // Hat band
+    ctx.fillStyle = '#8b1a1a';
+    ctx.fillRect(cx - w*0.05, bodyTop - h*0.08, w*0.10, h*0.015);
+    ctx.strokeStyle = '#c9a84c';
+    ctx.strokeRect(cx - w*0.06, bodyTop - h*0.28, w*0.12, h*0.18);
+  }
+
+  // Beard detail
+  if (cfg.bodyStyle === 'beard') {
+    ctx.fillStyle = '#4a4a3a';
+    ctx.beginPath();
+    ctx.moveTo(cx - w*0.12, bodyTop + h*0.05);
+    ctx.quadraticCurveTo(cx - w*0.15, bodyTop + h*0.25, cx, bodyTop + h*0.28);
+    ctx.quadraticCurveTo(cx + w*0.15, bodyTop + h*0.25, cx + w*0.12, bodyTop + h*0.05);
+    ctx.fill();
+  }
+
+  // Wing collar
+  if (cfg.bodyStyle === 'wing-collar') {
+    ctx.strokeStyle = '#f4e8c8';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(cx - w*0.08, bodyTop - h*0.02);
+    ctx.lineTo(cx - w*0.12, bodyTop + h*0.04);
+    ctx.moveTo(cx + w*0.08, bodyTop - h*0.02);
+    ctx.lineTo(cx + w*0.12, bodyTop + h*0.04);
+    ctx.stroke();
+  }
+
+  // Face (photo overlay)
+  if (faceImage) {
+    const bs = BODY_STYLES[cfg.bodyStyle] || BODY_STYLES['torn-blouse'];
+    const faceCX = cfg.faceX / 100 * w;
+    const faceCY = cfg.faceY / 100 * h;
+    const faceSize = cfg.faceScale / 100 * w * 0.22;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(faceCX, faceCY, faceSize, faceSize * 1.2, 0, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.globalAlpha = cfg.opacity / 100;
+    ctx.drawImage(faceImage, faceCX - faceSize, faceCY - faceSize * 1.2, faceSize * 2, faceSize * 2.4);
+    ctx.restore();
+  } else {
+    // Placeholder face
+    ctx.fillStyle = '#1a1a3a';
+    ctx.beginPath();
+    ctx.ellipse(cx, bodyTop, w*0.12, h*0.14, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle = '#c9a84c';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(201,168,76,0.3)';
+    ctx.font = '20px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('?', cx, bodyTop + 6);
+  }
+
+  // E-cig vapour (Brunel only)
+  if (engId === 'brunel') {
+    ctx.fillStyle = 'rgba(232,201,90,0.15)';
+    ctx.beginPath();
+    ctx.ellipse(cx + w*0.15, bodyTop - h*0.05, w*0.12, h*0.08, 0.3, 0, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(cx + w*0.2, bodyTop - h*0.12, w*0.08, h*0.06, 0.5, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(232,201,90,0.08)';
+    ctx.beginPath();
+    ctx.ellipse(cx + w*0.25, bodyTop - h*0.2, w*0.1, h*0.07, 0.6, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  // Engineer name and title
+  ctx.fillStyle = '#c9a84c';
+  ctx.font = '14px Cinzel, serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(eng.emoji + ' ' + eng.name, cx, h - 16);
+  
+  // Actor credit
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.font = '10px Cormorant Garamond, serif';
+  ctx.fillText('voiced by ' + eng.actor, cx, h - 4);
+}
+
+function renderCards() {
+  const grid = document.getElementById('engineerGrid');
+  grid.innerHTML = '';
+  
+  ENGINEERS.forEach(eng => {
+    const cfg = configs[eng.id];
+    const card = document.createElement('div');
+    card.className = 'engineer-card';
+    
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="name">${eng.emoji} ${eng.name}</span>
+        <span class="actor actor-${eng.actor === 'Jon' ? 'jon' : 'wife'}">${eng.actor}</span>
+      </div>
+      <div class="portrait-canvas-wrap">
+        <canvas id="canvas-${eng.id}" width="300" height="400"></canvas>
+      </div>
+      <div class="portrait-controls">
+        <label>Face Position X</label>
+        <input type="range" id="fx-${eng.id}" min="20" max="80" value="${cfg.faceX}" data-eng="${eng.id}" data-field="faceX">
+        <label>Face Position Y</label>
+        <input type="range" id="fy-${eng.id}" min="20" max="80" value="${cfg.faceY}" data-eng="${eng.id}" data-field="faceY">
+        <label>Face Size</label>
+        <input type="range" id="fs-${eng.id}" min="50" max="150" value="${cfg.faceScale}" data-eng="${eng.id}" data-field="faceScale">
+        <label>Opacity</label>
+        <input type="range" id="fo-${eng.id}" min="30" max="100" value="${cfg.opacity}" data-eng="${eng.id}" data-field="opacity">
+      </div>
+      <div class="body-style">
+        ${Object.keys(BODY_STYLES).map(bs => 
+          `<button class="${cfg.bodyStyle === bs ? 'active' : ''}" data-eng="${eng.id}" data-style="${bs}">${bs.replace(/-/g,' ')}</button>`
+        ).join('')}
+      </div>
+      <div class="face-source">
+        <button class="active">${faceImage ? 'Face loaded' : 'No face uploaded'}</button>
+      </div>
+    `;
+    
+    grid.appendChild(card);
+    
+    // Event listeners
+    card.querySelectorAll('input[type=range]').forEach(input => {
+      input.addEventListener('input', function() {
+        configs[this.dataset.eng][this.dataset.field] = parseInt(this.value);
+        drawEngineer(this.dataset.eng);
+      });
+    });
+    
+    card.querySelectorAll('.body-style button').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const engId = this.dataset.eng;
+        card.querySelectorAll('.body-style button').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        configs[engId].bodyStyle = this.dataset.style;
+        drawEngineer(engId);
+      });
+    });
+    
+    // Draw initial
+    setTimeout(() => drawEngineer(eng.id), 50);
+  });
+}
+
+// Face upload
+document.getElementById('faceUpload').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onloadend = function() {
+    const img = new Image();
+    img.onload = function() {
+      faceImage = img;
+      // Save to localStorage
+      localStorage.setItem('tpw-face', reader.result);
+      toast('Face loaded! Adjust position and size for each engineer.');
+      ENGINEERS.forEach(e => drawEngineer(e.id));
+      // Update face source buttons
+      document.querySelectorAll('.face-source button').forEach(b => {
+        b.textContent = '✅ Face loaded';
+        b.style.color = 'var(--live)';
+      });
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+// Load saved face
+(function() {
+  const saved = localStorage.getItem('tpw-face');
+  if (saved) {
+    const img = new Image();
+    img.onload = function() {
+      faceImage = img;
+      document.querySelectorAll('.face-source button').forEach(b => {
+        b.textContent = '✅ Face loaded';
+        b.style.color = 'var(--live)';
+      });
+    };
+    img.src = saved;
+  }
+})();
+
+// Save all
+document.getElementById('saveAllBtn').addEventListener('click', function() {
+  localStorage.setItem('tpw-portraits', JSON.stringify(configs));
+  toast('All portrait configs saved!');
+});
+
+// Reset all
+document.getElementById('resetAllBtn').addEventListener('click', function() {
+  if (!confirm('Reset all portrait configs?')) return;
+  ENGINEERS.forEach(e => {
+    const bs = BODY_STYLES[e.body];
+    configs[e.id] = {
+      faceX: 50, faceY: 50, faceScale: 100,
+      bodyStyle: e.body, opacity: 100,
+    };
+  });
+  localStorage.setItem('tpw-portraits', JSON.stringify(configs));
+  renderCards();
+  toast('All configs reset');
+});
+
+renderCards();
+</script>
+</body>
+</html>
