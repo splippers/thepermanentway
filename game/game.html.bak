@@ -265,8 +265,7 @@ header .tagline{font-style:italic;color:var(--steel);font-size:13px;letter-spaci
 </div>
 
 <script>
-const UK_COAST='M384.0 676.6 L408.0 661.5 L456.0 661.5 L508.0 646.3 L516.0 623.6 L504.0 608.4 L500.0 593.3 L512.0 578.1 L528.0 547.8 L528.0 525.1 L520.0 509.9 L476.0 494.7 L472.0 479.6 L464.0 472.0 L460.0 456.8 L460.0 441.7 L456.0 441.7 L452.0 434.1 L452.0 418.9 L444.0 396.2 L436.0 381.1 L412.0 365.9 L404.0 343.2 L396.0 320.4 L392.0 305.3 L388.0 297.7 L380.0 274.9 L356.0 267.4 L348.0 259.8 L352.0 252.2 L348.0 244.6 L344.0 237.1 L352.0 229.5 L360.0 214.3 L376.0 184.0 L384.0 168.8 L388.0 153.7 L380.0 138.5 L360.0 138.5 L340.0 146.1 L328.0 153.7 L316.0 153.7 L308.0 138.5 L300.0 138.5 L292.0 138.5 L288.0 123.4 L284.0 115.8 L264.0 100.6 L272.0 77.9 L284.0 70.3 L308.0 77.9 L328.0 85.5 L320.0 115.8 L304.0 123.4 L292.0 130.9 L292.0 146.1 L280.0 153.7 L272.0 161.3 L268.0 176.4 L260.0 191.6 L248.0 206.7 L244.0 221.9 L240.0 237.1 L236.0 259.8 L240.0 274.9 L244.0 290.1 L256.0 305.3 L264.0 312.8 L268.0 328.0 L264.0 343.2 L272.0 358.3 L284.0 365.9 L296.0 365.9 L312.0 358.3 L320.0 365.9 L336.0 373.5 L348.0 388.6 L348.0 403.8 L344.0 426.5 L340.0 441.7 L332.0 456.8 L320.0 472.0 L316.0 487.2 L316.0 502.3 L312.0 517.5 L300.0 532.6 L288.0 555.4 L280.0 570.5 L272.0 585.7 L256.0 593.3 L264.0 600.8 L284.0 593.3 L292.0 600.8 L304.0 608.4 L320.0 616.0 L340.0 623.6 L352.0 631.2 L348.0 646.3 L344.0 669.1 L356.0 676.6 L376.0 676.6 L384.0 676.6';
-const IRE_COAST='M220.0 328.0 L228.0 328.0 L236.0 328.0 L248.0 343.2 L260.0 350.7 L264.0 365.9 L256.0 373.5 L244.0 381.1 L236.0 388.6 L236.0 411.4 L232.0 434.1 L228.0 449.3 L220.0 456.8 L216.0 464.4 L212.0 472.0 L216.0 479.6 L220.0 494.7 L216.0 517.5 L208.0 540.2 L200.0 555.4 L188.0 562.9 L180.0 578.1 L168.0 578.1 L156.0 578.1 L144.0 585.7 L132.0 593.3 L116.0 600.8 L104.0 600.8 L92.0 585.7 L80.0 578.1 L72.0 570.5 L68.0 562.9 L64.0 547.8 L68.0 532.6 L72.0 525.1 L80.0 517.5 L84.0 509.9 L80.0 502.3 L88.0 487.2 L96.0 487.2 L92.0 479.6 L96.0 472.0 L100.0 456.8 L80.0 449.3 L72.0 441.7 L68.0 434.1 L68.0 418.9 L76.0 411.4 L88.0 403.8 L100.0 396.2 L112.0 388.6 L124.0 381.1 L132.0 373.5 L140.0 365.9 L148.0 358.3 L156.0 350.7 L164.0 335.6 L172.0 328.0 L184.0 320.4 L196.0 328.0 L208.0 328.0 L220.0 328.0';
+const MAP_URL='https://upload.wikimedia.org/wikipedia/commons/a/a8/Britanniques_%28Iles%29._-_Lloyd%27s_topographical_Railway_and_county_map_of_the_British_Isles..._-_btv1b53022772z_%281_of_4%29.jpg';
 
 const ENGINEERS=[
   {id:'brunel',name:'Isambard "The King" Brunel',emoji:'💨',title:'The King',
@@ -274,7 +273,7 @@ const ENGINEERS=[
    bonus:{eng:5,mor:3},quote:'I once designed a bridge, a tunnel, and a steamship between breakfast and luncheon. What have you done today?',unlock:0},
   {id:'stephenson',name:'George "Rocket" Stephenson',emoji:'🔥',title:'The Rocket',
    desc:'Barrel chest stuffed into a waistcoat that surrendered years ago. Muttonchops you could stable a pony in. Flat cap pulled low over eyes that have seen real engineering.',
-   bonus:{eng:4,fnd:2},quote:'Ye call that a rail? I\'ve seen stronger cheese. And I LIKE cheese. But I wouldn\'t build a railway on it.',unlock:2},
+   bonus:{eng:4,fnd:2},quote:'Ye call that a rail? I've seen stronger cheese. And I LIKE cheese. But I wouldn't build a railway on it.',unlock:2},
   {id:'stephenson_r',name:'Robert Stephenson',emoji:'🏛️',title:'The Prince',
    desc:'Chiselled jaw. Sideburns that could cast their own shadow. Waistcoat stretched heroically over a chest that built the Britannia Bridge. Polite. Devastating.',
    bonus:{eng:3,pol:3},quote:'My father built the Rocket. I built the Britannia. You built a risk register. Let us not speak of it further.',unlock:4},
@@ -401,23 +400,21 @@ for(const r of ROUTES){
 function clamp(v){return Math.max(0,Math.min(100,v))}
 
 const CITIES={
-  london:{x:455,y:608,name:'London'},bristol:{x:356,y:612,name:'Bristol'},
-  southampton:{x:404,y:653,name:'Southampton'},birmingham:{x:384,y:534,name:'Birmingham'},
-  liverpool:{x:340,y:464,name:'Liverpool'},manchester:{x:370,y:458,name:'Manchester'},
-  glasgow:{x:290,y:278,name:'Glasgow'},edinburgh:{x:332,y:271,name:'Edinburgh'},
-  york:{x:417,y:422,name:'York'},newcastle:{x:395,y:345,name:'Newcastle'},
-  derby:{x:401,y:501,name:'Derby'},nottingham:{x:414,y:498,name:'Nottingham'},
-  shrewsbury:{x:350,y:517,name:'Shrewsbury'},aberystwyth:{x:297,y:539,name:'Aberystwyth'},
-  folkestone:{x:507,y:640,name:'Folkestone'},inverness:{x:291,y:155,name:'Inverness'},
-  swansea:{x:302,y:599,name:'Swansea'},plymouth:{x:294,y:694,name:'Plymouth'},
-  dublin:{x:210,y:468,name:'Dublin'},belfast:{x:223,y:374,name:'Belfast'},
-  cork:{x:121,y:578,name:'Cork'},galway:{x:98,y:474,name:'Galway'},
-  derry:{x:168,y:344,name:'Derry'},
+  london:{x:478,y:632,name:'London'},bristol:{x:365,y:636,name:'Bristol'},
+  southampton:{x:440,y:660,name:'Southampton'},birmingham:{x:397,y:548,name:'Birmingham'},
+  liverpool:{x:345,y:462,name:'Liverpool'},manchester:{x:381,y:465,name:'Manchester'},
+  glasgow:{x:288,y:264,name:'Glasgow'},edinburgh:{x:337,y:257,name:'Edinburgh'},
+  york:{x:370,y:380,name:'York'},newcastle:{x:350,y:325,name:'Newcastle'},
+  derby:{x:390,y:490,name:'Derby'},nottingham:{x:405,y:500,name:'Nottingham'},
+  shrewsbury:{x:340,y:490,name:'Shrewsbury'},aberystwyth:{x:296,y:554,name:'Aberystwyth'},
+  folkestone:{x:502,y:653,name:'Folkestone'},inverness:{x:289,y:128,name:'Inverness'},
+  swansea:{x:310,y:580,name:'Swansea'},plymouth:{x:320,y:685,name:'Plymouth'},
+  dublin:{x:170,y:430,name:'Dublin'},belfast:{x:211,y:371,name:'Belfast'},
+  cork:{x:94,y:598,name:'Cork'},galway:{x:100,y:470,name:'Galway'},
+  derry:{x:170,y:334,name:'Derry'},
 };
 
-let mapZoom=1,mapPanX=0,mapPanY=0,mapDragging=false,mapMouseDownX=0,mapMouseDownY=0,mapDragStartX,mapDragStartY;
-const VIEW_GB={x:395,y:420,zoom:2.0};
-const VIEW_IE={x:152.5,y:466,zoom:2.8};
+let mapZoom=1,mapPanX=0,mapPanY=0,mapDragging=false,mapDragStartX,mapDragStartY;
 
 function renderMap(){
   const panel=document.getElementById('map-panel');
@@ -439,30 +436,16 @@ function renderMap(){
       font-size="7" font-family="Cinzel,serif" text-anchor="${isLondon?'start':'end'}" opacity="0.9">${c.name}</text>`;
   }).join('');
 
-  const gridLines=[50,100,150,200,250,300,350,400,450,500,550,600,650,700,750].map(y=>
-    `<line x1="40" y1="${y}" x2="560" y2="${y}" stroke="rgba(201,168,76,0.04)" stroke-width="0.5"/>`
-  ).join('')+[60,100,140,180,220,260,300,340,380,420,460,500,540].map(x=>
-    `<line x1="${x}" y1="40" x2="${x}" y2="760" stroke="rgba(201,168,76,0.04)" stroke-width="0.5"/>`
-  ).join('');
-
   panel.innerHTML=`<div class="map-transform" id="mapTransform">
     <svg viewBox="0 0 600 800" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <filter id="glow"><feGaussianBlur stdDeviation="1.5" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         <filter id="glowStrong"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         <radialGradient id="cityGlow"><stop offset="0%" stop-color="#c9a84c" stop-opacity="0.6"/><stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/></radialGradient>
-        <pattern id="seaPatter" width="20" height="20" patternUnits="userSpaceOnUse">
-          <rect width="20" height="20" fill="#0a1628"/><text x="2" y="16" font-size="8" fill="rgba(201,168,76,0.03)">~</text>
-        </pattern>
       </defs>
-      <rect width="600" height="800" fill="url(#seaPatter)"/>
-      <rect x="40" y="40" width="520" height="720" fill="none" stroke="#c9a84c" stroke-width="2" opacity="0.3" rx="4"/>
-      ${gridLines}
-      <path d="${UK_COAST}" fill="#121e3a" stroke="#8a7340" stroke-width="1.5"/>
-      <path d="${IRE_COAST}" fill="#121e3a" stroke="#8a7340" stroke-width="1.5"/>
-      <path d="${UK_COAST}" fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.25"/>
-      <path d="${IRE_COAST}" fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.25"/>
+      <image href="${MAP_URL}" x="0" y="0" width="600" height="800" preserveAspectRatio="xMidYMid meet" opacity="0.85"/>
       ${routeLines}
+      ${cityMarkers}
       ${state.restored.map(id=>{
         const r=ROUTES.find(x=>x.id===id);
         if(!r)return'';
@@ -470,15 +453,9 @@ function renderMap(){
         const gt=CITIES[r.sto.toLowerCase().replace(/\s/g,'')]||{x:300,y:400};
         return `<circle cx="${gf.x}" cy="${gf.y}" r="14" fill="url(#cityGlow)"/><circle cx="${gt.x}" cy="${gt.y}" r="14" fill="url(#cityGlow)"/>`;
       }).join('')}
-      ${cityMarkers}
     </svg></div>
-    <div id="route-legend">
-      <div class="legend-item"><div class="legend-dot" style="background:var(--live)"></div> Live</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--dead)"></div> Destroyed</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--heritage)"></div> Heritage</div>
-    </div>
     <div id="zoom-controls">
-      <button id="zoomIn">+</button><button id="zoomOut">−</button><button id="zoomReset">⟲</button><button id="zoomIreland">🇮🇪</button>
+      <button id="zoomIn">+</button><button id="zoomOut">−</button><button id="zoomReset">⟲</button>
     </div>
     <div id="zoom-level">100%</div>`;
 
@@ -498,20 +475,17 @@ function setupMapInteraction(panel){
   panel.querySelectorAll('.map-line.available').forEach(line=>{
     line.addEventListener('click',e=>{
       if(mapDragging)return;
-      const dx=e.clientX-mapMouseDownX,dy=e.clientY-mapMouseDownY;
-      if(dx*dx+dy*dy>16)return;
       const rid=line.dataset.route;
       if(!state.busy&&!state.gameOver)attemptRestore(rid);
     });
   });
   document.getElementById('zoomIn').addEventListener('click',()=>zoomMap(0.3));
   document.getElementById('zoomOut').addEventListener('click',()=>zoomMap(-0.3));
-  document.getElementById('zoomReset').addEventListener('click',()=>centreMap(VIEW_GB.x,VIEW_GB.y,VIEW_GB.zoom));
-  document.getElementById('zoomIreland').addEventListener('click',()=>centreMap(VIEW_IE.x,VIEW_IE.y,VIEW_IE.zoom));
+  document.getElementById('zoomReset').addEventListener('click',()=>{mapZoom=1;mapPanX=0;mapPanY=0;applyMapTransform();});
   panel.addEventListener('wheel',e=>{e.preventDefault();zoomMap(e.deltaY>0?-0.1:0.1,e.offsetX,e.offsetY);},{passive:false});
-  panel.addEventListener('mousedown',e=>{mapDragging=true;mapMouseDownX=e.clientX;mapMouseDownY=e.clientY;mapDragStartX=e.clientX-mapPanX;mapDragStartY=e.clientY-mapPanY;});
+  panel.addEventListener('mousedown',e=>{mapDragging=true;mapDragStartX=e.clientX-mapPanX;mapDragStartY=e.clientY-mapPanY;});
   document.addEventListener('mousemove',e=>{if(!mapDragging)return;mapPanX=e.clientX-mapDragStartX;mapPanY=e.clientY-mapDragStartY;applyMapTransform();});
-  document.addEventListener('mouseup',()=>{mapDragging=false;});
+  document.addEventListener('mouseup',()=>{setTimeout(()=>{mapDragging=false;},10);});
   let lastTouchDist=0;
   panel.addEventListener('touchstart',e=>{if(e.touches.length===2){const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;lastTouchDist=Math.sqrt(dx*dx+dy*dy);}},{passive:true});
   panel.addEventListener('touchmove',e=>{if(e.touches.length!==2)return;e.preventDefault();const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY,dist=Math.sqrt(dx*dx+dy*dy);if(lastTouchDist){const delta=(dist-lastTouchDist)/100;zoomMap(delta);}lastTouchDist=dist;},{passive:false});
@@ -528,15 +502,6 @@ function zoomMap(delta,cx,cy){
   const scale=mapZoom/oldZoom;
   mapPanX=mx-scale*(mx-mapPanX);
   mapPanY=my-scale*(my-mapPanY);
-  applyMapTransform();
-}
-
-function centreMap(svgX,svgY,zoom){
-  const panel=document.getElementById('map-panel');
-  const rect=panel.getBoundingClientRect();
-  mapZoom=Math.max(0.3,Math.min(5,zoom));
-  mapPanX=rect.width/2-svgX*mapZoom;
-  mapPanY=rect.height/2-svgY*mapZoom;
   applyMapTransform();
 }
 
@@ -758,7 +723,6 @@ function startGame(){
   addNarration('Marc Brunel\'s voice echoes from the signal box mirror: "The Permanent Way is wounded, boy. Every abandoned alignment. Every rusted rail. They remember you. <em>Build.</em>"','marc');
   addNarration(`<span style="color:var(--steel);font-size:13px">The railways of Britain — green for those that still run, red for those that were stolen by Beeching and his suits, orange for the heritage lines kept alive by volunteers and prayer.</span><br><br><span class="highlight">Choose a line. Restore it. Reconnect the nation.</span>`,'system');
   renderMap();
-  centreMap(VIEW_GB.x,VIEW_GB.y,VIEW_GB.zoom);
   updateStats();
 
   const panel=document.getElementById('map-panel');
@@ -772,7 +736,6 @@ function startGame(){
 }
 
 renderMap();
-centreMap(VIEW_GB.x,VIEW_GB.y,VIEW_GB.zoom);
 
 // ---------------------------------------------------------------------------
 // Voice & Portrait Integration — reads from localStorage written by the
