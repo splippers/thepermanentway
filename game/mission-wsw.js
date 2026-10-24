@@ -69,10 +69,10 @@ const WSW_MISSION = {
       photos: [{ key: 'trail', caption: 'The Blackwater Rail Trail, which follows most of the old trackbed. (The photo\'s caption does not give the exact spot.)' }],
       paras: [
         'Opened on 2 October 1848 simply as "Langford", the station became Langford and Ulting on 1 July 1923. It stood 4 miles 38 chains (7.2 km) from Witham, with a single platform, and closed to passengers on 7 September 1964. A local newsletter gives 1966, the year the goods trains ended; the passenger date is 1964.',
-        'The old platform has since been restored beside the former station master\'s cottage, now a private home.',
+        'It was built for two tracks, but the second was lifted very early, and the station stayed basic: a platform that was later lengthened, a shelter with a bench and two oil lamps, and a signal box opposite the platform that had gone by 1922. A photograph from about 1905 shows a station mistress living in the house behind the platform. The platform survives, clear of undergrowth, as part of the Blackwater Rail Trail, beside the station master\'s house, now in private hands.',
         'Langford was a small place on a small station on a line the planners decided it could do without. It is the kind of stop a planner finds easy to cut and a village finds hard to forget.',
       ],
-      today: 'The platform has been restored. The trail passes the site.',
+      today: 'The platform survives, clear of undergrowth, and forms part of the Blackwater Rail Trail. The station master\'s house is private.',
       brunel: '"A village with a platform is a village with a future. A village without one is a car park waiting to happen."',
       coach: 'MOR is the public\'s faith. Small stops move it more than their size suggests: people notice when their own village is on the map.',
       choices: [
@@ -81,6 +81,7 @@ const WSW_MISSION = {
       ],
       sources: [
         ['Wikipedia: Langford and Ulting railway station', 'https://en.wikipedia.org/wiki/Langford_and_Ulting_railway_station'],
+        ['Disused Stations: Langford & Ulting (many historic photographs and maps)', 'http://www.disused-stations.org.uk/l/langford%26ulting/index.shtml'],
         ['Friends of the Flitch Way: Blackwater Rail Trail', 'https://www.friends-of-the-flitch-way.org.uk/blackwater-rail-trail.html'],
         ['It\'s About Maldon: the history of the railway lines to Maldon', 'https://www.itsaboutmaldon.co.uk/railway/'],
       ],
@@ -106,6 +107,7 @@ const WSW_MISSION = {
       ],
       sources: [
         ['Wikipedia: Maldon East and Heybridge railway station', 'https://en.wikipedia.org/wiki/Maldon_East_and_Heybridge_railway_station'],
+        ['Disused Stations: Maldon East & Heybridge (photographs from the 1930s, c.1970 and 1971)', 'http://www.disused-stations.org.uk/m/maldon/index.shtml'],
         ['It\'s About Maldon: the history of the railway lines to Maldon', 'https://www.itsaboutmaldon.co.uk/railway/'],
       ],
     },
