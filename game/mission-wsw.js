@@ -26,7 +26,7 @@ const WSW_MISSION = {
       paras: [
         'Witham opened on 29 March 1843 on the Eastern Counties Railway\'s line towards Colchester. It became a junction on 2 October 1848, when the Maldon, Witham & Braintree Railway opened: one branch north-west to Braintree, one south-east to Maldon.',
         'The Braintree branch is still running. The Maldon branch served Witham for 116 years. Platform 1, rarely used now, is the one the Maldon trains used.',
-        'Four platforms and four trains an hour to London Liverpool Street: the main line is healthy. The branch that left it is not. The new A12 Witham bypass bridge over the line was finished only months before the last passenger train in 1964. After the track was lifted in 1969, the old "Catholic" bridge at Witham was reinforced with concrete and timber supports, which blocked the line.',
+        'Four platforms and four trains an hour to London Liverpool Street: the main line is healthy. The branch that left it is not. The new A12 Witham bypass bridge over the line was finished only months before the last passenger train in 1964. After the track was lifted in 1969 or 1966 (it is unclear which), the old "Catholic" bridge at Witham was reinforced with concrete and timber supports, which blocked the line.',
       ],
       today: 'Station open. The Maldon branch is gone; its trackbed is now largely the Blackwater Rail Trail. A short stub kept serving an industrial site with steel deliveries after 1966 and closed in the early 1980s.',
       brunel: '"A junction should be a handshake, not a full stop. Why does my branch begin and end in a hedge?"',
@@ -119,7 +119,7 @@ const WSW_MISSION = {
       photos: [{ key: 'maldon_west_embankment', caption: 'The embankment path that once carried the branch south from Maldon West towards South Woodham Ferrers.' }],
       paras: [
         'Maldon West opened on 1 October 1889 on the Great Eastern\'s new branch from Woodham Ferrers, part of the New Essex Lines scheme. From March 1890 a Saturdays-only through train ran between Southend and Colchester, calling here; it was withdrawn on 1 March 1895.',
-        'The station closed on 22 May 1916 during the First World War, reopened on 1 August 1919 as Maldon West Halt, and closed to passengers for good on 10 September 1939. Passenger trains were withdrawn as a wartime economy and never came back. The goods yard lasted until 1959, with freight reversing at Maldon East when it reopened between 1957 and 1959.',
+        'The station closed on 22 May 1916 during the First World War, reopened on 1 August 1919 as Maldon West Halt, and closed to passengers for good on 10 September 1939 or 10 April 1939 (it is unclear which). Passenger trains were withdrawn as a wartime economy and never came back, though a steam special ran over the branch in April 1957, with J67 tank No. 68628 and a crowd at Maldon West. The goods yard lasted until 1959 or 1953 (it is unclear which), with freight reversing at Maldon East when it reopened between 1957 and 1959.',
         'The link from the Witham line to Maldon West was double track on an embankment. It crossed the Chelmer and Blackwater Navigation on iron bridges and the River Chelmer on a brick-arch and bowstring-girder viaduct of 75 feet span, built in 1889. South of the viaduct the line dropped into a deep cutting and Maldon West station, immediately north of Spital Road, with a 66-yard tunnel under the road. The central span of the viaduct was demolished in 1965 and its piers in 1989; the 1990 bypass bridge over the Chelmer sits 1.8 m (6 ft) lower than the old deck. The tunnel was blocked at both ends, though its southern portal and balustrade survive, and the station was demolished in 1969. Its portals could be seen until the late 1980s. The Maldon bypass (A414) now covers the site and uses the trackbed between the two Maldon stations. One red-brick goods shed and a brick wall over the tunnel remain.',
       ],
       today: 'Under the bypass. A path follows the embankment south.',
@@ -133,6 +133,7 @@ const WSW_MISSION = {
       sources: [
         ['Essex County Council, The Lost Railways of the Blackwater and Crouch Estuaries: a field survey (Kemble and Garwood, 2011)', 'http://www.esah1852.org.uk/library/files/the-lost-railways-of-the-blackwater-and-crouch-estuaries-2162120244.pdf'],
         ['Wikipedia: Maldon West railway station', 'https://en.wikipedia.org/wiki/Maldon_West_railway_station'],
+        ['Local knowledge: the April 1957 steam special (locomotive number from the Maldon Reborn project page; not in the written sources)', null],
         ['Wikipedia: Witham to Maldon branch line', 'https://en.wikipedia.org/wiki/Witham_to_Maldon_branch_line'],
         ['It\'s About Maldon: the history of the railway lines to Maldon', 'https://www.itsaboutmaldon.co.uk/railway/'],
       ],
