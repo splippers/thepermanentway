@@ -136,10 +136,10 @@ const WSW_MISSION = {
       photos: [{ key: 'lost_line', caption: 'The old branch line between Maldon and Cold Norton, which closed to passengers in 1939 and finally closed in 1953 (photo caption).' }],
       paras: [
         'Barons Lane served the village of Purleigh. The sidings opened with the line on 1 October 1889, but the halt itself came much later, on 10 July 1922. It had one platform and no other facilities. It closed in September 1939 with the other passenger stops on the branch, and goods lasted to 1953 or 1959, depending on the source.',
-        'The line here ran in a cutting under Barons Lane (now the B1010). The cutting is a tree-lined ditch now, the bridge has been filled in, and the brick parapet still stands beside the road. The road over it is a humpback; locals will tell you it gives a car airtime.',
+        'The line here ran in a cutting under Barons Lane (now the B1010). The cutting is a tree-lined ditch now, the bridge has been filled in, and the brick parapet still stands beside the road. The road over it is a humpback; locals will tell you it gives a car airtime. The line is largely unbroken from Woodham Road, where it ran alongside the road and a bridge carried it over the access to a farmer\'s field (the bridge has since been broken down), all the way to Maldon West. Between Woodham Road and South Woodham Ferrers only a scar in the ground remains. Several bridges along the route have been broken down so farm vehicles can get through.',
         'It is a small place and a short story, and the nation was built from small places.',
       ],
-      today: 'A tree-lined ditch where the cutting ran. The B1010 still crosses it on the filled-in bridge, its brick parapet visible from the road, and a local recollection says the humpback launches cars every time.',
+      today: 'A tree-lined ditch where the cutting ran. The B1010 still crosses it on a filled-in bridge, its brick parapet visible from the road. A local recollection says the humpback launches cars every time. The trackbed is largely unbroken from the broken-down bridge beside Woodham Road, which carried it over a farm access, to Maldon West. From South Woodham Ferrers to that bridge only a scar remains.',
       brunel: '"A halt: a platform, a bench, a lantern. Brave little things. They ask for so little and are cut first."',
       coach: 'Funds low? The Lobby the Treasury button in the right panel ends the week for +6 FND and −2 POL. Use it when the books are tight: it is the way out of any cash crisis.',
       choices: [
@@ -148,7 +148,7 @@ const WSW_MISSION = {
       ],
       sources: [
         ['Wikipedia: Barons Lane Halt railway station', 'https://en.wikipedia.org/wiki/Barons_Lane_Halt_railway_station'],
-        ['Local knowledge and Google Street View (May 2024), viewed not reproduced: the ditch, the filled-in bridge and the humpback on the B1010 (not in the written sources)', null],
+        ['Local knowledge and Google Street View (May 2024), viewed not reproduced: the ditch, the filled-in bridge, the humpback, the broken-down farm-access bridge beside Woodham Road and the state of the trackbed between South Woodham Ferrers and Maldon West (not in the written sources)', null],
       ],
     },
     {
@@ -180,7 +180,7 @@ const WSW_MISSION = {
         'The LNER opened Stow St Mary Halt on 24 September 1928, to serve the village of Stow Maries. The station was named differently from the village, reportedly at the vicar\'s insistence. One platform, nothing else. It closed in September 1939, like the rest.',
         'The site is now the Stow Maries Halt nature reserve, managed by the Essex Wildlife Trust.',
       ],
-      today: 'Nature reserve, managed by the Essex Wildlife Trust.',
+      today: 'Nature reserve, managed by the Essex Wildlife Trust, beside Church Lane. The brick parapet of the bridge there still stands, overgrown with hedge and ivy. It sits on a relatively intact part of the line, though several bridges along the way have been broken down, some to give farm vehicles access. One is at Honey Pot Lane, where a tall brick abutment still stands beside the lane.',
       brunel: '"A railway through a nature reserve. Wildflowers and wagons. I have built through worse."',
       coach: 'Conflicts are normal. A line is useful only because people and places tolerate it. Balance MOR against the others before you commit.',
       choices: [
@@ -189,6 +189,7 @@ const WSW_MISSION = {
       ],
       sources: [
         ['Wikipedia: Stow St Mary Halt railway station', 'https://en.wikipedia.org/wiki/Stow_St_Mary_Halt_railway_station'],
+        ['Local knowledge and Google Street View (May 2024), viewed not reproduced: the bridge parapet on Church Lane, the broken bridge at Honey Pot Lane and the state of the line (not in the written sources)', null],
       ],
     },
     {
@@ -199,7 +200,7 @@ const WSW_MISSION = {
         'It was the junction for the Maldon West branch. It once had two platforms, a footbridge, a goods yard and a 36-lever signal box. The goods yard closed in 1964; the south platform, goods loop, footbridge and signal box were decommissioned on 21 January 1967. The line was electrified at 25 kV on 12 May 1986.',
         'Greater Anglia runs Class 720 electric trains here: one every 40 minutes off-peak in each direction between Wickford and Southminster, hourly on Sundays, some peak services running through to London Liverpool Street. The station handled around 0.318 million passengers in 2024–25.',
       ],
-      today: 'Open, with one platform. The Maldon branch left from here.',
+      today: 'Open, with one platform. The Maldon branch left from here; between the station and the broken-down bridge beside Woodham Road, only a scar in the ground marks its path.',
       brunel: '"Here the line ends. Or begins. A railway has no end, merely a series of places where one has decided to stop."',
       coach: 'This is the last stop. When you choose, the line is restored: you earn its rewards, pay its cost, and the rest of the map opens to you.',
       choices: [
