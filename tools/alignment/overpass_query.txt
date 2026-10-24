@@ -1,0 +1,8 @@
+[out:json][timeout:60];
+(
+ way["railway"~"abandoned|disused|razed|dismantled"](51.63,0.58,51.82,0.71);
+ way["historic:railway"](51.63,0.58,51.82,0.71);
+ way["railway:historic"](51.63,0.58,51.82,0.71);
+ way["abandoned:railway"](51.63,0.58,51.82,0.71);
+);
+out tags geom;

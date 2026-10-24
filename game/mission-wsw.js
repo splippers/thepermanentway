@@ -26,7 +26,7 @@ const WSW_MISSION = {
       paras: [
         'Witham opened on 29 March 1843 on the Eastern Counties Railway\'s line towards Colchester. It became a junction on 2 October 1848, when the Maldon, Witham & Braintree Railway opened: one branch north-west to Braintree, one south-east to Maldon.',
         'The Braintree branch is still running. The Maldon branch served Witham for 116 years. Platform 1, rarely used now, is the one the Maldon trains used.',
-        'Four platforms and four trains an hour to London Liverpool Street: the main line is healthy. The branch that left it is not.',
+        'Four platforms and four trains an hour to London Liverpool Street: the main line is healthy. The branch that left it is not. The new A12 Witham bypass bridge over the line was finished only months before the last passenger train in 1964. After the track was lifted in 1969, the old "Catholic" bridge at Witham was reinforced with concrete and timber supports, which blocked the line.',
       ],
       today: 'Station open. The Maldon branch is gone; its trackbed is now largely the Blackwater Rail Trail. A short stub kept serving an industrial site with steel deliveries after 1966 and closed in the early 1980s.',
       brunel: '"A junction should be a handshake, not a full stop. Why does my branch begin and end in a hedge?"',
@@ -36,6 +36,7 @@ const WSW_MISSION = {
         { text: 'Hold a consultation first. Bring the council and the train operator into the room.', effect: { pol: 2, mor: -1 }, result: 'Friendlier relations, slower start. Some of the public will find the delay tiresome.' },
       ],
       sources: [
+        ['Essex County Council, The Lost Railways of the Blackwater and Crouch Estuaries: a field survey (Kemble and Garwood, 2011)', 'http://www.esah1852.org.uk/library/files/the-lost-railways-of-the-blackwater-and-crouch-estuaries-2162120244.pdf'],
         ['Wikipedia: Witham railway station', 'https://en.wikipedia.org/wiki/Witham_railway_station'],
         ['Wikipedia: Witham to Maldon branch line', 'https://en.wikipedia.org/wiki/Witham_to_Maldon_branch_line'],
       ],
@@ -49,7 +50,7 @@ const WSW_MISSION = {
       paras: [
         'Opened on 2 October 1848 as "Wickham", the station was renamed Wickham Bishops on 1 October 1913. It had one platform and sat 2 miles 39 chains (4 km) from Witham. It closed on 7 September 1964, with the rest of the branch.',
         'Just beyond it the line crossed the River Blackwater on a timber trestle viaduct. It was one of six timber trestle viaducts on the line. Historic England records this one, dated to 1847, as the only known surviving timber trestle railway viaduct, and it is a scheduled monument.',
-        'The station building is reported to be a private house now, and the platform survives.',
+        'The station house, built in the cottage-orné style around 1848, is a private house now, and the platform survives. A county survey records two timber viaducts here, 160 feet long over the River Blackwater and the mill leat, and notes the track was cut from double to single in 1854.',
       ],
       today: 'A scheduled monument. The Blackwater Rail Trail runs along the trackbed, with a short gap at Wickham Bishops.',
       brunel: '"Timber! In my day we used it for everything. Now it is a monument and I am not allowed to touch it. The irony would be exquisite if I were in a mood to enjoy it."',
@@ -59,6 +60,7 @@ const WSW_MISSION = {
         { text: 'Replace the viaduct with a modern steel bridge. It is faster and carries more.', effect: { eng: 2, pol: -4, mor: -2 }, result: 'The line gets stronger and quicker, but the heritage lobby is furious. Scheduled monuments are not yours to remove.' },
       ],
       sources: [
+        ['Essex County Council, The Lost Railways of the Blackwater and Crouch Estuaries: a field survey (Kemble and Garwood, 2011)', 'http://www.esah1852.org.uk/library/files/the-lost-railways-of-the-blackwater-and-crouch-estuaries-2162120244.pdf'],
         ['Wikipedia: Wickham Bishops railway station', 'https://en.wikipedia.org/wiki/Wickham_Bishops_railway_station'],
         ['Historic England: Wickham Bishops timber trestle railway viaduct (list entry 1002126)', 'https://historicengland.org.uk/listing/the-list/list-entry/1002126'],
         ['Wikipedia: Witham to Maldon branch line', 'https://en.wikipedia.org/wiki/Witham_to_Maldon_branch_line'],
@@ -69,7 +71,7 @@ const WSW_MISSION = {
       photos: [{ key: 'trail', caption: 'The Blackwater Rail Trail, which follows most of the old trackbed. (The photo\'s caption does not give the exact spot.)' }],
       paras: [
         'Opened on 2 October 1848 simply as "Langford", the station became Langford and Ulting on 1 July 1923. It stood 4 miles 38 chains (7.2 km) from Witham, with a single platform, and closed to passengers on 7 September 1964. A local newsletter gives 1966, the year the goods trains ended; the passenger date is 1964.',
-        'It was built for two tracks, but the second was lifted very early, and the station stayed basic: a platform that was later lengthened, a shelter with a bench and two oil lamps, and a signal box opposite the platform that had gone by 1922. A photograph from about 1905 shows a station mistress living in the house behind the platform. The platform survives, clear of undergrowth, as part of the Blackwater Rail Trail, beside the station master\'s house, now in private hands.',
+        'It was built for two tracks, but the second was lifted very early, and the station stayed basic: a platform that was later lengthened, a shelter with a bench and two oil lamps, and a signal box opposite the platform that had gone by 1922. A photograph from about 1905 shows a station mistress living in the house behind the platform. The platform survives as part of the Blackwater Rail Trail, beside the station master\'s house, now in private hands. The house was built decades before the railway and bought by the company. (A 2011 county survey found the platform almost buried under soil and turf; later accounts say it has been cleared and restored.)',
         'Langford was a small place on a small station on a line the planners decided it could do without. It is the kind of stop a planner finds easy to cut and a village finds hard to forget.',
       ],
       today: 'The platform survives, clear of undergrowth, and forms part of the Blackwater Rail Trail. The station master\'s house is private.',
@@ -80,6 +82,7 @@ const WSW_MISSION = {
         { text: 'A proper station, reusing the old platform and cottage.', effect: { fnd: -3, mor: 3, pol: 1 }, result: 'The village turns out to cheer. It cost more, and it will be loved.' },
       ],
       sources: [
+        ['Essex County Council, The Lost Railways of the Blackwater and Crouch Estuaries: a field survey (Kemble and Garwood, 2011)', 'http://www.esah1852.org.uk/library/files/the-lost-railways-of-the-blackwater-and-crouch-estuaries-2162120244.pdf'],
         ['Wikipedia: Langford and Ulting railway station', 'https://en.wikipedia.org/wiki/Langford_and_Ulting_railway_station'],
         ['Disused Stations: Langford & Ulting (many historic photographs and maps)', 'http://www.disused-stations.org.uk/l/langford%26ulting/index.shtml'],
         ['Friends of the Flitch Way: Blackwater Rail Trail', 'https://www.friends-of-the-flitch-way.org.uk/blackwater-rail-trail.html'],
@@ -117,17 +120,18 @@ const WSW_MISSION = {
       paras: [
         'Maldon West opened on 1 October 1889 on the Great Eastern\'s new branch from Woodham Ferrers, part of the New Essex Lines scheme. From March 1890 a Saturdays-only through train ran between Southend and Colchester, calling here; it was withdrawn on 1 March 1895.',
         'The station closed on 22 May 1916 during the First World War, reopened on 1 August 1919 as Maldon West Halt, and closed to passengers for good on 10 September 1939. Passenger trains were withdrawn as a wartime economy and never came back. The goods yard lasted until 1959, with freight reversing at Maldon East when it reopened between 1957 and 1959.',
-        'There was a tunnel at Maldon West, later filled in; its portals could be seen until the late 1980s. The Maldon bypass (A414) now covers the site and uses the trackbed between the two Maldon stations. One red-brick goods shed and a brick wall over the tunnel remain.',
+        'The link from the Witham line to Maldon West was double track on an embankment. It crossed the Chelmer and Blackwater Navigation on iron bridges and the River Chelmer on a brick-arch and bowstring-girder viaduct of 75 feet span, built in 1889. South of the viaduct the line dropped into a deep cutting and Maldon West station, immediately north of Spital Road, with a 66-yard tunnel under the road. The central span of the viaduct was demolished in 1965 and its piers in 1989; the 1990 bypass bridge over the Chelmer sits 1.8 m (6 ft) lower than the old deck. The tunnel was blocked at both ends, though its southern portal and balustrade survive, and the station was demolished in 1969. Its portals could be seen until the late 1980s. The Maldon bypass (A414) now covers the site and uses the trackbed between the two Maldon stations. One red-brick goods shed and a brick wall over the tunnel remain.',
       ],
       today: 'Under the bypass. A path follows the embankment south.',
       brunel: '"They have laid a dual carriageway across my alignment. I do not object to motorists; I object to being ignored."',
       coach: 'Obstacles have no single answer. Pick the dial you can afford to spend: money, engineering effort, or political capital.',
       choices: [
-        { text: 'Tunnel beneath the bypass. Expensive, clever, and out of sight.', effect: { eng: 3, fnd: -4, pol: 1 }, result: 'A fine piece of engineering that nobody will ever see. The drainage will be difficult for generations.' },
+        { text: 'Re-bore the 66-yard Spital Road tunnel beneath the bypass junction. Expensive, clever, and out of sight.', effect: { eng: 3, fnd: -4, pol: 1 }, result: 'A fine piece of engineering that nobody will ever see. The drainage will be difficult for generations.' },
         { text: 'Negotiate with the county council for a rail corridor alongside the road.', effect: { pol: -3, fnd: -1, eng: 1 }, result: 'It works, eventually. Every meeting costs you favour with someone.' },
         { text: 'Skip Maldon West and join the Witham line by a new curve at Maldon East.', effect: { eng: 2, mor: -2, fnd: -2 }, result: 'Quicker to build, and the town loses a station it once had.' },
       ],
       sources: [
+        ['Essex County Council, The Lost Railways of the Blackwater and Crouch Estuaries: a field survey (Kemble and Garwood, 2011)', 'http://www.esah1852.org.uk/library/files/the-lost-railways-of-the-blackwater-and-crouch-estuaries-2162120244.pdf'],
         ['Wikipedia: Maldon West railway station', 'https://en.wikipedia.org/wiki/Maldon_West_railway_station'],
         ['Wikipedia: Witham to Maldon branch line', 'https://en.wikipedia.org/wiki/Witham_to_Maldon_branch_line'],
         ['It\'s About Maldon: the history of the railway lines to Maldon', 'https://www.itsaboutmaldon.co.uk/railway/'],
@@ -139,6 +143,7 @@ const WSW_MISSION = {
       paras: [
         'Barons Lane served the village of Purleigh. The sidings opened with the line on 1 October 1889, but the halt itself came much later, on 10 July 1922. It had one platform and no other facilities. It closed in September 1939 with the other passenger stops on the branch, and goods lasted to 1953 or 1959, depending on the source.',
         'The line here ran in a cutting under Barons Lane (now the B1010). The cutting is a tree-lined ditch now, the bridge has been filled in, and the brick parapet still stands beside the road. The road over it is a humpback; locals will tell you it gives a car airtime. The line is largely unbroken from Woodham Road, where it ran alongside the road and a bridge carried it over the access to a farmer\'s field (the bridge has since been broken down), all the way to Maldon West. Between Woodham Road and South Woodham Ferrers only a scar in the ground remains. Several bridges along the route have been broken down so farm vehicles can get through.',
+        'A county survey records the original bridge as a girder and blue engineering brick bridge with blue brick copings. The halt\'s platform lay west of the track, north of the bridge, in a shallow cutting, reached by an incline from the lane that was still visible in 2011. At "The Street" in Purleigh, nearby, only the brick abutments of an embankment bridge remain.',
         'It is a small place and a short story, and the nation was built from small places.',
       ],
       today: 'A tree-lined ditch where the cutting ran. The B1010 still crosses it on a filled-in bridge, its brick parapet visible from the road. A local recollection says the humpback launches cars every time. The trackbed is largely unbroken from the broken-down bridge beside Woodham Road, which carried it over a farm access, to Maldon West. From South Woodham Ferrers to that bridge only a scar remains.',
@@ -149,6 +154,7 @@ const WSW_MISSION = {
         { text: 'Rebuild the halt as it was: platform, shelter, lamp.', effect: { mor: 2, fnd: -1 }, result: 'Purleigh has a platform again. It is the cheapest cheer in the whole project.' },
       ],
       sources: [
+        ['Essex County Council, The Lost Railways of the Blackwater and Crouch Estuaries: a field survey (Kemble and Garwood, 2011)', 'http://www.esah1852.org.uk/library/files/the-lost-railways-of-the-blackwater-and-crouch-estuaries-2162120244.pdf'],
         ['Wikipedia: Barons Lane Halt railway station', 'https://en.wikipedia.org/wiki/Barons_Lane_Halt_railway_station'],
         ['Local knowledge and Google Street View (May 2024), viewed not reproduced: the ditch, the filled-in bridge, the humpback, the broken-down farm-access bridge beside Woodham Road and the state of the trackbed between South Woodham Ferrers and Maldon West (not in the written sources)', null],
       ],
@@ -161,7 +167,7 @@ const WSW_MISSION = {
       ],
       paras: [
         'Cold Norton opened on 1 October 1889 as "Cold Norton for Purleigh and Stow Maries", later "Cold Norton for Latchingdon". It had a passing loop, a station building, a parcels shed, goods sidings and a signal box, which was reduced to a ground frame in 1939. A fatal accident happened near here in 1899; the sources give no details.',
-        'Passenger trains ended in September 1939 (10 September in one source). Goods trains carried on until 1953 or 1959, depending on the source. The B1012 crosses the old trackbed here by a bridge; the station stood beside it.',
+        'The line approached Cold Norton through a long, deep cutting, now partly or wholly filled in. The Latchingdon Road bridge, of three segmental brick arches with dentilled decoration, still carries the road, and railway cottages survive. Passenger trains ended in September 1939 (10 September in one source). Goods trains carried on until 1953 or 1959, depending on the source. The B1012 crosses the old trackbed here by a bridge; the station stood beside it.',
       ],
       today: 'The station is gone. The bridge carrying the B1012 over the trackbed remains, and a permissive footpath follows part of the old branch near here.',
       brunel: '"A loop. At last a proper piece of engineering on this wretched branch."',
@@ -171,6 +177,7 @@ const WSW_MISSION = {
         { text: 'Keep it single track with a timetable that fits. Quieter and cheaper.', effect: { fnd: -1, mor: -1, eng: 1 }, result: 'It works, though people will want more trains before long.' },
       ],
       sources: [
+        ['Essex County Council, The Lost Railways of the Blackwater and Crouch Estuaries: a field survey (Kemble and Garwood, 2011)', 'http://www.esah1852.org.uk/library/files/the-lost-railways-of-the-blackwater-and-crouch-estuaries-2162120244.pdf'],
         ['Wikipedia: Cold Norton railway station', 'https://en.wikipedia.org/wiki/Cold_Norton_railway_station'],
         ['Wikipedia: Witham to Maldon branch line', 'https://en.wikipedia.org/wiki/Witham_to_Maldon_branch_line'],
       ],
@@ -182,7 +189,7 @@ const WSW_MISSION = {
         'The LNER opened Stow St Mary Halt on 24 September 1928, to serve the village of Stow Maries. The station was named differently from the village, reportedly at the vicar\'s insistence. One platform, nothing else. It closed in September 1939, like the rest.',
         'The site is now the Stow Maries Halt nature reserve, managed by the Essex Wildlife Trust.',
       ],
-      today: 'Nature reserve, managed by the Essex Wildlife Trust, beside Church Lane. The brick parapet of the bridge there still stands, overgrown with hedge and ivy. It sits on a relatively intact part of the line, though several bridges along the way have been broken down, some to give farm vehicles access. One is at Honey Pot Lane, where a tall brick abutment still stands beside the lane.',
+      today: 'Nature reserve, managed by the Essex Wildlife Trust, beside Church Lane. The bridge there, of three segmental arches in blue engineering brick, still stands, its parapet overgrown with hedge and ivy. At Honey Pot Lane the line crossed on a brick bridge of which only the two abutments remain. It sits on a relatively intact part of the line, though several bridges along the way have been broken down, some to give farm vehicles access. One is at Honey Pot Lane, where a tall brick abutment still stands beside the lane.',
       brunel: '"A railway through a nature reserve. Wildflowers and wagons. I have built through worse."',
       coach: 'Conflicts are normal. A line is useful only because people and places tolerate it. Balance MOR against the others before you commit.',
       choices: [
@@ -190,6 +197,7 @@ const WSW_MISSION = {
         { text: 'Take the shortest route through the reserve and pay compensation.', effect: { eng: 2, fnd: -2, pol: -3, mor: -2 }, result: 'A straighter line, an angry county, and some very pointed letters.' },
       ],
       sources: [
+        ['Essex County Council, The Lost Railways of the Blackwater and Crouch Estuaries: a field survey (Kemble and Garwood, 2011)', 'http://www.esah1852.org.uk/library/files/the-lost-railways-of-the-blackwater-and-crouch-estuaries-2162120244.pdf'],
         ['Wikipedia: Stow St Mary Halt railway station', 'https://en.wikipedia.org/wiki/Stow_St_Mary_Halt_railway_station'],
         ['Local knowledge and Google Street View (May 2024), viewed not reproduced: the bridge parapet on Church Lane, the broken bridge at Honey Pot Lane and the state of the line (not in the written sources)', null],
       ],
@@ -199,7 +207,7 @@ const WSW_MISSION = {
       photos: [{ key: 'swf', caption: 'South Woodham Ferrers station, 2008.' }],
       paras: [
         'The Great Eastern opened the station for goods on 1 June 1889 and passengers on 1 July 1889, as "Woodham Ferris". It became Woodham Ferrers on 1 October 1913 and South Woodham Ferrers on 20 May 2007. It was meant for a village a few miles north; later development built a much larger town around it. The station serves both.',
-        'It was the junction for the Maldon West branch. It once had two platforms, a footbridge, a goods yard and a 36-lever signal box. The goods yard closed in 1964; the south platform, goods loop, footbridge and signal box were decommissioned on 21 January 1967. The line was electrified at 25 kV on 12 May 1986.',
+        'It was the junction for the Maldon West branch, which left the Southminster line just east of the level crossing. The building of the new town of South Woodham Ferrers from the 1970s obliterated the track towards Cold Norton and Maldon; today its path survives in property boundaries and a footpath north of Bancrofts Road. It once had two platforms, a footbridge, a goods yard and a 36-lever signal box. The goods yard closed in 1964; the south platform, goods loop, footbridge and signal box were decommissioned on 21 January 1967. The line was electrified at 25 kV on 12 May 1986.',
         'Greater Anglia runs Class 720 electric trains here: one every 40 minutes off-peak in each direction between Wickford and Southminster, hourly on Sundays, some peak services running through to London Liverpool Street. The station handled around 0.318 million passengers in 2024–25.',
       ],
       today: 'Open, with one platform. The Maldon branch left from here; between the station and the broken-down bridge beside Woodham Road, only a scar in the ground marks its path.',
@@ -210,6 +218,7 @@ const WSW_MISSION = {
         { text: 'Run the Maldon branch as a shuttle that meets the main-line trains at South Woodham Ferrers.', effect: { fnd: 1, eng: 1, mor: -1 }, result: 'Cheaper and easier to run. Passengers will have to change, and some will grumble.' },
       ],
       sources: [
+        ['Essex County Council, The Lost Railways of the Blackwater and Crouch Estuaries: a field survey (Kemble and Garwood, 2011)', 'http://www.esah1852.org.uk/library/files/the-lost-railways-of-the-blackwater-and-crouch-estuaries-2162120244.pdf'],
         ['Wikipedia: South Woodham Ferrers railway station', 'https://en.wikipedia.org/wiki/South_Woodham_Ferrers_railway_station'],
         ['Wikipedia: Crouch Valley line', 'https://en.wikipedia.org/wiki/Crouch_Valley_line'],
       ],

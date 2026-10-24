@@ -1,0 +1,10 @@
+station,chainage_m,offset_from_wikipedia_coord_m,lat_on_centreline,lon_on_centreline,z_fit_m,trace_confidence,profile_flag
+Witham,0,379,51.806966,0.644376,26.0,0.19,measured
+Wickham Bishops,3815,1,51.773196,0.643105,13.1,1.0,measured
+Langford & Ulting,7065,1,51.748007,0.666601,6.5,1.0,measured
+Maldon East & Heybridge,8295,658,51.738657,0.674651,6.9,1.0,interpolated
+Maldon West,9915,16,51.726159,0.665682,35.1,1.0,interpolated
+Barons Lane Halt,13965,5,51.690622,0.670163,16.2,0.9,interpolated
+Cold Norton,16115,12,51.671835,0.673638,29.3,1.0,measured
+Stow Maries Halt,18135,8,51.661132,0.651434,19.2,1.0,measured
+South Woodham Ferrers,21385,182,51.64985,0.609614,7.0,0.71,measured
