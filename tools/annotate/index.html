@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Annotate</title>
+<style>
+:root{color-scheme:dark;--bg:#14181a;--bar:#1f2528;--fg:#e8e4d8;--dim:#9aa39c;--accent:#d9a441}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,sans-serif;overflow:hidden}
+#bar{position:fixed;left:0;right:0;top:0;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 10px;background:var(--bar);z-index:5}
+#stage{position:fixed;inset:0;top:var(--barh,52px);touch-action:none}
+canvas{position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none}
+button,select,input[type=text]{background:#2c3438;color:var(--fg);border:1px solid #444d52;border-radius:6px;padding:7px 11px;font:inherit}
+button.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent)}
+.sw{width:30px;height:30px;padding:0;border-radius:50%}
+.sp{flex:1}
+#msg{color:var(--dim);font-size:.85rem}
+label{display:flex;gap:5px;align-items:center;color:var(--dim);font-size:.85rem}
+</style>
+</head>
+<body>
+<div id="bar">
+  <select id="img" aria-label="Image"></select>
+  <button id="t_pen" class="on">Pen</button><button id="t_hi">Highlighter</button><button id="t_text">Note</button><button id="t_hand">Hand</button>
+  <button class="sw" data-c="#ff3b30" style="background:#ff3b30" aria-label="Red"></button>
+  <button class="sw" data-c="#ffd60a" style="background:#ffd60a" aria-label="Yellow"></button>
+  <button class="sw" data-c="#30d158" style="background:#30d158" aria-label="Green"></button>
+  <button class="sw" data-c="#0a84ff" style="background:#0a84ff" aria-label="Blue"></button>
+  <button class="sw" data-c="#ffffff" style="background:#fff" aria-label="White"></button>
+  <button class="sw" data-c="#000000" style="background:#000" aria-label="Black"></button>
+  <label>Width <input id="w" type="range" min="1" max="24" value="4"></label>
+  <label><input id="finger" type="checkbox"> Finger draws</label>
+  <button id="undo">Undo</button><button id="clear">Clear</button>
+  <input id="note" type="text" placeholder="What is this about?" size="22">
+  <button id="save">Save</button>
+  <button id="up">Add photo</button><input id="file" type="file" accept="image/*" hidden>
+  <span class="sp"></span><span id="msg"></span>
+</div>
+<div id="stage"><canvas id="c"></canvas></div>
+<script>
+const K=new URLSearchParams(location.search).get('k')||'';
+const $=id=>document.getElementById(id);
+const api=(p)=>p+(p.includes('?')?'&':'?')+'k='+encodeURIComponent(K);
+const cv=$('c'),ctx=cv.getContext('2d'),stage=$('stage');
+let img=null,imgName='',strokes=[],cur=null,tool='pen',color='#ff3b30';
+let view={s:1,x:0,y:0},ptrs=new Map(),gest=null,dpr=window.devicePixelRatio||1;
+const say=t=>{$('msg').textContent=t;};
+function layout(){const h=$('bar').offsetHeight;document.documentElement.style.setProperty('--barh',h+'px');
+  const r=stage.getBoundingClientRect();cv.width=r.width*dpr;cv.height=r.height*dpr;draw();}
+function fit(){if(!img)return;const r=stage.getBoundingClientRect();view.s=Math.min(r.width/img.width,r.height/img.height);view.x=(r.width-img.width*view.s)/2;view.y=(r.height-img.height*view.s)/2;draw();}
+const toImg=(cx,cy)=>({x:(cx-view.x)/view.s,y:(cy-view.y)/view.s});
+function strokePath(c,st){
+  c.lineCap='round';c.lineJoin='round';c.strokeStyle=st.c;c.fillStyle=st.c;
+  if(st.type=='text'){c.font=st.w+'px system-ui,sans-serif';c.textBaseline='top';c.lineWidth=Math.max(2,st.w/6);c.strokeStyle='#000';c.strokeText(st.t,st.p[0].x,st.p[0].y);c.fillText(st.t,st.p[0].x,st.p[0].y);return;}
+  c.globalAlpha=st.type=='hi'?0.35:1;
+  for(let i=1;i<st.p.length;i++){const a=st.p[i-1],b=st.p[i];c.lineWidth=st.w*(st.type=='hi'?4:1)*(0.35+0.9*((a.f+b.f)/2));c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();}
+  if(st.p.length==1){c.beginPath();c.arc(st.p[0].x,st.p[0].y,st.w*(st.type=='hi'?2:.5),0,7);c.fill();}
+  c.globalAlpha=1;
+}
+function render(c,withImage){if(withImage&&img)c.drawImage(img,0,0);for(const s of strokes)strokePath(c,s);if(cur)strokePath(c,cur);}
+function draw(){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);ctx.fillStyle='#14181a';ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.setTransform(dpr*view.s,0,0,dpr*view.s,dpr*view.x,dpr*view.y);render(ctx,true);}
+function pos(e){const r=cv.getBoundingClientRect();return {cx:e.clientX-r.left,cy:e.clientY-r.top};}
+const drawing=e=>tool!='hand'&&(e.pointerType!='touch'||$('finger').checked);
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);const {cx,cy}=pos(e);ptrs.set(e.pointerId,{cx,cy,type:e.pointerType});
+  if(ptrs.size>=2){cur=null;startGesture();draw();return;}
+  if(drawing(e)){const p=toImg(cx,cy);
+    if(tool=='text'){const t=prompt('Note text');if(t){strokes.push({type:'text',c:color,w:Math.round(Math.max(16,$('w').value*4)),t,p:[{x:p.x,y:p.y,f:1}]});draw();}return;}
+    cur={type:tool=='hi'?'hi':'pen',c:color,w:+$('w').value/view.s*1.0,p:[{x:p.x,y:p.y,f:e.pressure&&e.pressure>0?e.pressure:.5}]};draw();}
+  else startGesture();});
+cv.addEventListener('pointermove',e=>{if(!ptrs.has(e.pointerId))return;const {cx,cy}=pos(e);ptrs.get(e.pointerId).cx=cx;ptrs.get(e.pointerId).cy=cy;
+  if(ptrs.size>=2||(gest&&!cur)){moveGesture();return;}
+  if(cur){const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];for(const ev of evs){const q=pos(ev),p=toImg(q.cx,q.cy);cur.p.push({x:p.x,y:p.y,f:ev.pressure>0?ev.pressure:.5});}draw();}});
+function end(e){if(!ptrs.has(e.pointerId))return;ptrs.delete(e.pointerId);if(cur&&ptrs.size==0){strokes.push(cur);cur=null;draw();}if(ptrs.size<2)gest=null;if(ptrs.size==1&&!cur)startGesture();}
+cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+function startGesture(){const a=[...ptrs.values()];if(!a.length){gest=null;return;}
+  const m=a.reduce((s,p)=>({x:s.x+p.cx/a.length,y:s.y+p.cy/a.length}),{x:0,y:0});
+  const d=a.length>1?Math.hypot(a[0].cx-a[1].cx,a[0].cy-a[1].cy):0;gest={m,d,s:view.s,x:view.x,y:view.y};}
+function moveGesture(){if(!gest)return startGesture();const a=[...ptrs.values()];if(!a.length)return;
+  const m=a.reduce((s,p)=>({x:s.x+p.cx/a.length,y:s.y+p.cy/a.length}),{x:0,y:0});
+  let k=1;if(a.length>1&&gest.d>0)k=Math.hypot(a[0].cx-a[1].cx,a[0].cy-a[1].cy)/gest.d;
+  const ns=Math.min(20,Math.max(.05,gest.s*k)),ix=(gest.m.x-gest.x)/gest.s,iy=(gest.m.y-gest.y)/gest.s;
+  view.s=ns;view.x=m.x-ix*ns;view.y=m.y-iy*ns;draw();}
+cv.addEventListener('wheel',e=>{e.preventDefault();const {cx,cy}=pos(e),p=toImg(cx,cy),k=Math.exp(-e.deltaY*.0015);view.s=Math.min(20,Math.max(.05,view.s*k));view.x=cx-p.x*view.s;view.y=cy-p.y*view.s;draw();},{passive:false});
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+function setTool(t){tool=t;for(const id of ['pen','hi','text','hand'])$('t_'+id).classList.toggle('on',id==t);}
+for(const id of ['pen','hi','text','hand'])$('t_'+id).onclick=()=>setTool(id);
+document.querySelectorAll('.sw').forEach(b=>b.onclick=()=>{color=b.dataset.c;document.querySelectorAll('.sw').forEach(x=>x.classList.toggle('on',x==b));});
+$('undo').onclick=()=>{strokes.pop();draw();};
+$('clear').onclick=()=>{if($('clear').dataset.arm){strokes=[];draw();$('clear').textContent='Clear';delete $('clear').dataset.arm;}else{$('clear').dataset.arm=1;$('clear').textContent='Tap again to clear';setTimeout(()=>{$('clear').textContent='Clear';delete $('clear').dataset.arm;},2500);}};
+function loadImage(name){return new Promise(r=>{const i=new Image();i.onload=()=>{img=i;imgName=name;strokes=[];cur=null;fit();say(name+' ('+i.width+' x '+i.height+')');r();};i.onerror=()=>say('Could not load '+name);i.src=api('/images/'+encodeURIComponent(name));});}
+$('img').onchange=()=>loadImage($('img').value);
+async function list(sel){const r=await fetch(api('/api/images'));if(!r.ok){say('Wrong or missing token in the address');return;}const n=await r.json();
+  $('img').innerHTML=n.map(x=>'<option>'+x+'</option>').join('');if(sel)$('img').value=sel;if(n.length&&!imgName)loadImage($('img').value);}
+$('save').onclick=async()=>{if(!img)return;const o=document.createElement('canvas');o.width=img.width;o.height=img.height;const c=o.getContext('2d');cur=null;render(c,true);
+  const r=await fetch(api('/api/save'),{method:'POST',body:JSON.stringify({image:imgName,note:$('note').value,strokes,width:img.width,height:img.height,png:o.toDataURL('image/png')})});
+  const j=await r.json();say(r.ok?'Saved '+j.saved:'Save failed');};
+$('up').onclick=()=>$('file').click();
+$('file').onchange=async()=>{const f=$('file').files[0];if(!f)return;const name=(f.name||'photo.jpg').replace(/[^A-Za-z0-9._-]/g,'_');
+  const r=await fetch(api('/api/upload?name='+encodeURIComponent(name)),{method:'POST',body:f});if(r.ok){await list(name);loadImage(name);}else say('Upload failed');};
+addEventListener('resize',()=>{layout();fit();});
+document.querySelector('.sw').classList.add('on');
+layout();list();
+</script>
+</body>
+</html>
