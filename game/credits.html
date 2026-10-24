@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Credits — The Permanent Way</title>
+<style>
+body{background:#0a0e27;color:#f4e8c8;font-family:Georgia,serif;max-width:860px;margin:0 auto;padding:32px 20px;line-height:1.5}
+h1,h2{color:#c9a84c;font-weight:normal}
+a{color:#c9a84c}
+li{margin-bottom:10px}
+img{max-width:120px;vertical-align:top;margin-right:12px;border-radius:3px;float:left}
+li{overflow:auto}
+.small{color:#8a7a5a;font-size:14px}
+</style>
+</head>
+<body>
+<h1>Credits</h1>
+<p><a href="index.html">← Game hub</a></p>
+
+<h2>Photographs and maps (Mission 1)</h2>
+<p class="small">All images come from Wikimedia Commons under Creative Commons Attribution-ShareAlike licences or in the public domain. They are resized to 900 px wide. Each is credited beside where it appears in the game; the full list is here.</p>
+<ul id="images"></ul>
+
+<h2>Research sources</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Witham_to_Maldon_branch_line">Wikipedia: Witham to Maldon branch line</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Witham_railway_station">Wikipedia: Witham railway station</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Wickham_Bishops_railway_station">Wikipedia: Wickham Bishops railway station</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Langford_and_Ulting_railway_station">Wikipedia: Langford and Ulting railway station</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Maldon_East_and_Heybridge_railway_station">Wikipedia: Maldon East and Heybridge railway station</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Maldon_West_railway_station">Wikipedia: Maldon West railway station</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Barons_Lane_Halt_railway_station">Wikipedia: Barons Lane Halt railway station</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Cold_Norton_railway_station">Wikipedia: Cold Norton railway station</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Stow_St_Mary_Halt_railway_station">Wikipedia: Stow St Mary Halt railway station</a></li>
+<li><a href="https://en.wikipedia.org/wiki/South_Woodham_Ferrers_railway_station">Wikipedia: South Woodham Ferrers railway station</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Crouch_Valley_line">Wikipedia: Crouch Valley line</a></li>
+<li><a href="https://historicengland.org.uk/listing/the-list/list-entry/1002126">Historic England: Wickham Bishops timber trestle railway viaduct, list entry 1002126</a></li>
+<li><a href="https://www.itsaboutmaldon.co.uk/railway/">It's About Maldon: the history of the railway lines to Maldon</a></li>
+<li><a href="https://www.friends-of-the-flitch-way.org.uk/blackwater-rail-trail.html">Friends of the Flitch Way: Blackwater Rail Trail</a></li>
+</ul>
+<p class="small">Where sources disagree (final passenger closure of the Woodham Ferrers branch, 10 or 11 September 1939; end of goods in 1953 or 1959; the style of Maldon East station) the game says so. Station coordinates in the route inset come from each station's Wikipedia article. Coastlines are from Natural Earth (public domain).</p>
+
+<script src="wsw-images.js"></script>
+<script>
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+document.getElementById('images').innerHTML=Object.values(WSW_IMAGES).map(i=>
+  `<li><img src="${i.file}" alt=""><b>${esc(i.title)}</b><br>${esc(i.author)}, `+
+  (i.licenseUrl?`<a href="${i.licenseUrl}">${esc(i.license)}</a>`:esc(i.license))+
+  `, <a href="${i.source}">Wikimedia Commons</a></li>`).join('');
+</script>
+</body>
+</html>

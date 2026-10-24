@@ -4,7 +4,7 @@
 
 When a catastrophic HS2 engineering failure accidentally tears open a portal beneath the Chilterns, Victorian titan Isambard Kingdom Brunel is resurrected. Furious, confused, and riding a stolen horse, he sets out to rebuild Britain’s broken railway network and restore the soul of the nation.
 
-Starring Tom Cruise as Brunel.
+*(Running joke: Tom Cruise as Brunel. Not a casting plan.)*
 
 ---
 
