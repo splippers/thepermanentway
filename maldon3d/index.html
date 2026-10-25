@@ -27,7 +27,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 <p>Ground: Environment Agency 1 m LIDAR (2022), so the 1990 bypass and later building are in it. "As built" shows the stations new (1848 and 1889); the other button shows how they stood in the early 1980s. Layout: the 1897 Ordnance Survey plans reproduced in the Essex County Council survey (2011), placed using today's roads and the Lovers Lane crossing (about ±25 m). Buildings, heights, the overbridge, the rolling stock and the Maldon West cutting are inferred and drawn as simple blocks.</p>
 <div class="row"><button data-era="built" class="on">As built (1848, 1889)</button><button data-era="eighties">Early 1980s</button></div>
 <div class="row">
-<button data-v="station">Station</button><button data-v="bridge">Overbridge</button><button data-v="road">From the road</button><button data-v="shed">Goods shed</button><button data-v="triangle">Triangle</button><button data-v="wstation">Maldon West</button><button data-v="wtunnel">West tunnel</button><button data-v="wshed">West goods shed</button><button data-v="lcut">Cutting</button><button data-v="lroad">London Road</button><button data-v="lviad">Chelmer viaduct</button><button data-v="all">Overview</button>
+<button data-v="station">Station</button><button data-v="facade">Station front</button><button data-v="bridge">Overbridge</button><button data-v="road">From the road</button><button data-v="shed">Goods shed</button><button data-v="triangle">Triangle</button><button data-v="wstation">Maldon West</button><button data-v="wtunnel">West tunnel</button><button data-v="wshed">West goods shed</button><button data-v="lcut">Cutting</button><button data-v="lroad">London Road</button><button data-v="lviad">Chelmer viaduct</button><button data-v="all">Overview</button>
 </div>
 <label for="map"><span>1897 plan</span><input id="map" type="range" min="0" max="1" step="0.05" value="0"></label>
 <label for="ex"><span>Height exaggeration</span><input id="ex" type="range" min="1" max="4" step="0.25" value="1"></label>
@@ -109,7 +109,7 @@ const WW=(u,v)=>{const [E,N]=toENW(u,v);return new THREE.Vector3(E-e0,0,n1-N);};
 const mat=(c,o={})=>new THREE.MeshLambertMaterial(Object.assign({color:c},o));
 const M={brick:mat(0x8e4a38),brick2:mat(0xa5624a),roof:mat(0x4b4f52),ballast:mat(0x4a4036),conc:mat(0x8d8d85),white:mat(0xd9d6c8),timber:mat(0x6d5a3e),dark:mat(0x1a1a1a),iron:mat(0x2e3a35)};
 const brickTexBase=(()=>{const c=document.createElement('canvas');c.width=c.height=144;const x=c.getContext('2d');x.fillStyle='#b9b2a3';x.fillRect(0,0,144,144);
-  for(let r=0;r<12;r++){const off=(r%2)*18;for(let b=-1;b<5;b++){const k=Math.abs(Math.sin(r*12.9898+b*78.233)*43758.5453%1);x.fillStyle='hsl('+(7+k*9)+','+(40+k*16)+'%,'+(28+k*11)+'%)';x.fillRect(b*36+off+1,r*12+1,34,10);}}
+  for(let r=0;r<12;r++){const off=(r%2)*18;for(let b=-1;b<5;b++){const k=Math.abs(Math.sin(r*12.9898+b*78.233)*43758.5453%1);x.fillStyle='hsl('+(7+k*8)+','+(48+k*18)+'%,'+(34+k*12)+'%)';x.fillRect(b*36+off+1,r*12+1,34,10);}}
   const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=4;return t;})();
 // six face materials for a box, with the brick texture repeated at about 0.9 m per tile
 function brickMats(sx,sy,sz,tint){
@@ -382,32 +382,67 @@ function build(){
   // radial glazed windows on the ground floor, Jacobean chimney stacks. Proportions: Maldon Reborn (inferred) and the 1970s photograph.
   {const k=nearIdx(r,665,485),p=r[k],f=frame(r,k),ry=Math.atan2(-f.dz,f.dx),y=p.deck,b0=W(665,485);
    const dOff=Math.max(11,(b0.x-p.x)*f.nx+(b0.z-p.z)*f.nz);
-   const cx=p.x+f.nx*(dOff-7.6),cz=p.z+f.nz*(dOff-7.6);                       // platform between the building and the tracks
+   const cx=p.x+f.nx*(dOff-8.4),cz=p.z+f.nz*(dOff-8.4);                       // platform between the building and the tracks
    box(G,M.conc,cx,y+.46,cz,100,.92,5,ry);
    const bx=p.x+f.nx*dOff,bz=p.z+f.nz*dOff,st=new THREE.Group();st.position.set(bx,y,bz);st.rotation.y=ry;G.add(st);   // local x along the platform, +z towards the forecourt
-   const brick=new THREE.MeshLambertMaterial({color:0xc9a98d,map:(()=>{const t=brickTexBase.clone();t.needsUpdate=true;t.repeat.set(1,1);return t;})()});
-   const dress=new THREE.MeshLambertMaterial({color:0xe3d8b8}),glass=new THREE.MeshLambertMaterial({color:0x26323a});
-   const fade=ERA=='built'?1:.72;
-   const wing=(xc,L)=>{box(st,brickMats(L,5.4,8.2),xc,2.7,.4,L,5.4,8.2,0);box(st,dress,xc,5.55,.4,L+.4,.3,8.6,0);   // single-storey wing, stone cornice
-     box(st,dress,xc,5.95,4.35,L+.2,.7,.3,0);for(let i=0;i<Math.floor(L/1.1);i++)box(st,dress,xc-L/2+.55+i*1.1,6.0,4.35,.3,.9,.3,0);};   // balustrade
-   const central=(xc,L)=>{box(st,brickMats(L,9.6,9.4),xc,4.8,0,L,9.6,9.4,0);box(st,dress,xc,9.75,0,L+.5,.35,9.9,0);box(st,SLATE,xc,10.4,0,L-1,.9,7,0);};
-   wing(-12.6,11.4);wing(12.6,11.4);central(0,14);
-   // nine arches on the forecourt face, the middle three in the two-storey block
-   for(let i=0;i<9;i++){const x=(i-4)*4.1,tall=i>=3&&i<=5,bw=2.7,bh=tall?5.6:3.9,zf=tall?4.72:4.52;
-     const ring=arch(bw+.7,bh+.35,dress);ring.position.set(x,tall?.5:.5,zf);st.add(ring);
-     const op=arch(bw,bh,glass);op.position.set(x,.55,zf+.02);st.add(op);
-     for(let r2=0;r2<5;r2++){const m=box(st,dress,x,.55+bh-bw/2,zf+.04,.06,bw/2+.1,.04,0);m.rotation.z=(r2-2)*.5;m.position.y=.55+bh-bw/2+.45;m.position.x=x+Math.sin((r2-2)*.5)*.55;}  // radial glazing bars
-   }
-   [-1,1].forEach(sd=>[-1,0,1].forEach(j=>{const w=arch(1.6,2.4,glass);w.position.set(j*4.1,6.2,4.74);w.scale.set(1,1,1);st.add(w);}));
-   // three clustered chimney stacks on the central block, a stack on each wing
-   [-3.6,0,3.6].forEach(x=>{box(st,brickMats(1.2,4.4,1.2),x,12.6,0,1.2,4.4,1.2,0);box(st,dress,x,14.9,0,1.55,.25,1.55,0);});
-   [-17.2,17.2].forEach(x=>{box(st,brickMats(1.1,3.2,1.1),x,7.3,0,1.1,3.2,1.1,0);box(st,dress,x,9.0,0,1.4,.25,1.4,0);});
+   // From photographs (a 1900s postcard, the poster and 2000s views): a single-storey range of nine round arches between two
+   // two-storey end pavilions with curvilinear (Dutch) gables, a panelled balustrade, white dressings and grey diaper in the spandrels.
+   const built=ERA=='built';
+   const dress=new THREE.MeshLambertMaterial({color:built?0xeee8d6:0xb9b2a0}),diaper=new THREE.MeshLambertMaterial({color:built?0x6b6f78:0x50535a});
+   const glass=new THREE.MeshLambertMaterial({color:0x222c33}),slate=new THREE.MeshLambertMaterial({color:0x4a4f55});
+   const bt=built?0xffffff:0xc8b8aa;
+   box(st,new THREE.MeshLambertMaterial({color:0x8a857a}),0,.15,-.2,39,.3,11,0);                               // plinth
+   // open loggia: back wall with arched windows and three doorways
+   box(st,brickMats(37,5.4,.5,bt),0,2.7,1.2,37,5.4,.5,0);
+   for(let i=0;i<9;i++){const x=(i-4)*4.1,door=(i==1||i==4||i==7);
+     const o=arch(door?1.8:1.9,door?3.4:2.7,door?DOOR:glass);o.position.set(x,.6,1.47);st.add(o);
+     if(!door){const m=arch(2.3,3.1,dress);m.position.set(x,.55,1.46);st.add(m);}}
+   // front wall with nine arched openings (white stucco piers and arch rings)
+   {const sh=new THREE.Shape();sh.moveTo(-18.7,0);sh.lineTo(18.7,0);sh.lineTo(18.7,5.7);sh.lineTo(-18.7,5.7);sh.lineTo(-18.7,0);
+    for(let i=0;i<9;i++){const x=(i-4)*4.1,h=new THREE.Path();h.moveTo(x-1.5,0);h.lineTo(x+1.5,0);h.lineTo(x+1.5,2.7);h.absarc(x,2.7,1.5,0,Math.PI,false);h.lineTo(x-1.5,0);sh.holes.push(h);}
+    const g=new THREE.ExtrudeGeometry(sh,{depth:.75,bevelEnabled:false});const m=new THREE.Mesh(g,dress);m.position.set(0,.3,4.2);st.add(m);}
+   box(st,diaper,0,5.0,4.97,37.4,.8,.04,0);                                                                       // grey diaper band over the arches
+   box(st,dress,0,6.1,4.7,38.2,.4,1.5,0);                                                                         // string course and cornice
+   // balustrade: rail, panelled balusters, piers over each arcade pier
+   box(st,dress,0,6.5,4.7,37.8,.3,.7,0);box(st,dress,0,7.55,4.7,37.8,.3,.7,0);
+   {const im=new THREE.InstancedMesh(new THREE.BoxGeometry(.17,.95,.17),dress,84),o=new THREE.Object3D();for(let i=0;i<84;i++){o.position.set(-18.5+i*(37/83),7.0,4.7);o.updateMatrix();im.setMatrixAt(i,o.matrix);}st.add(im);}
+   for(let i=0;i<=9;i++)box(st,dress,-18.45+i*4.1,7.1,4.7,.7,1.5,.7,0);
+   // roof of the central range, behind the balustrade
+   [1,-1].forEach(sd=>{const m=box(st,slate,0,8.2,-1.5+sd*2.6,35,.22,5.6,0);m.rotation.x=sd*.42;});
+   // end pavilions
+   [-1,1].forEach(sd=>{
+     const xc=sd*13.4;
+     box(st,brickMats(10.4,9.6,8.6,bt),xc,4.8,-1.9,10.4,9.6,8.6,0);                                              // body, front face at z=2.4
+     [-1,1].forEach(q=>box(st,dress,xc+q*5.0,4.8,2.45,.55,9.6,.35,0));                                            // stone quoins
+     box(st,dress,xc,5.9,2.5,10.5,.3,.3,0);box(st,dress,xc,9.55,2.5,10.5,.35,.5,0);                              // string courses
+     box(st,dress,xc,8.0,2.52,2.1,3.0,.12,0);box(st,glass,xc,8.0,2.6,1.5,2.5,.06,0);box(st,dress,xc,6.8,2.56,2.5,.25,.35,0); // first-floor window and sill
+     [-1,1].forEach(q=>box(st,dress,xc+q*2.6,8.0,2.52,.9,2.4,.1,0));
+     // Dutch gable
+     const gs=new THREE.Shape(),W2=4.5;gs.moveTo(-W2,0);gs.lineTo(-W2,1.0);gs.quadraticCurveTo(-W2,1.8,-3.6,2.0);gs.quadraticCurveTo(-3.1,2.1,-3.1,3.0);gs.quadraticCurveTo(-3.1,4.3,-1.4,4.7);gs.quadraticCurveTo(-.6,4.85,0,5.5);
+     gs.quadraticCurveTo(.6,4.85,1.4,4.7);gs.quadraticCurveTo(3.1,4.3,3.1,3.0);gs.quadraticCurveTo(3.1,2.1,3.6,2.0);gs.quadraticCurveTo(W2,1.8,W2,1.0);gs.lineTo(W2,0);gs.lineTo(-W2,0);
+     const gbr=brickMats(1,1,1,bt)[4];gbr.map.repeat.set(1/.9,1/.9);
+     const gm=new THREE.Mesh(new THREE.ExtrudeGeometry(gs,{depth:.6,bevelEnabled:false}),gbr);gm.position.set(xc,9.6,1.8);st.add(gm);
+     const cs=new THREE.Shape();gs.getPoints(24).forEach((q,i)=>{const sx=q.x*1.07,sy=q.y*1.07-.05;if(i==0)cs.moveTo(sx,sy);else cs.lineTo(sx,sy);});
+     const cm=new THREE.Mesh(new THREE.ExtrudeGeometry(cs,{depth:.5,bevelEnabled:false}),dress);cm.position.set(xc,9.6,1.55);st.add(cm);
+     const fin=new THREE.Mesh(new THREE.SphereGeometry(.34,10,8),dress);fin.position.set(xc,9.6+5.75,2.1);st.add(fin);
+     const pl=new THREE.Mesh(new THREE.CircleGeometry(.5,18),dress);pl.position.set(xc,9.6+3.4,2.43);st.add(pl);
+     // slate roof, ridge front to back
+     [1,-1].forEach(q=>{const m=box(st,slate,xc+q*2.3,9.6+1.9,-2.6,5.2,.22,7.2,0);m.rotation.z=-q*.62;});
+     // tall Jacobean stacks on the inner side of each pavilion, and a lower one at the back
+     box(st,brickMats(1.4,7.2,1.4,bt),sd*9.4,9.6+3.6,.2,1.4,7.2,1.4,0);box(st,dress,sd*9.4,9.6+7.35,.2,1.85,.35,1.85,0);box(st,brickMats(1.5,.9,1.5,bt),sd*9.4,9.6+7.95,.2,1.5,.9,1.5,0);
+     box(st,brickMats(1.1,4.6,1.1,bt),xc+sd*3.6,9.6+2.3,-4.6,1.1,4.6,1.1,0);box(st,dress,xc+sd*3.6,9.6+4.75,-4.6,1.45,.3,1.45,0);
+   });
+   // white post-and-rail fence and two gates across the forecourt (as in the poster and the postcard)
+   if(built){const wm=new THREE.MeshLambertMaterial({color:0xf2eee0});
+     for(let i=-9;i<=9;i++){box(st,wm,i*3,.55,19,.16,1.1,.16,0);}
+     [.45,.9].forEach(h=>box(st,wm,0,h,19,56,.08,.08,0));
+     [-1,1].forEach(sd=>{box(st,wm,sd*8,.55,19,.2,1.2,.2,0);box(st,wm,sd*11.5,.55,19,.2,1.2,.2,0);[.3,.6,.9].forEach(h=>box(st,wm,sd*9.75,h,19,3.3,.07,.07,0));box(st,wm,sd*9.75,.6,19,3.3,.06,.06,0).rotation.z=.2;});}
    const can=new THREE.Group();can.name='canopy';
    box(can,M.iron,cx,y+4.3,cz,100,.25,5.4,ry);
    box(can,new THREE.MeshLambertMaterial({color:0xd8d2c0}),cx+f.nx*2.8,y+3.95,cz+f.nz*2.8,100,.45,.12,ry);                 // valance, deep saw-tooth edge (inferred)
    for(let i=-13;i<=13;i++){box(can,M.iron,cx+f.dx*i*3.75+f.nx*1.8,y+2.7,cz+f.dz*i*3.75+f.nz*1.8,.25,3.4,.25,ry);}
    G.add(can);
-   label('Maldon East station, 1848 (survey: nine-arch front, Jacobean stacks; proportions inferred)',bx,y+17,bz);
+   label('Maldon East station, 1848: nine-arch front between two Dutch-gabled pavilions (from photographs; depth inferred)',bx,y+21,bz);
    label('Platform and canopy (inferred)',cx+f.dx*35,y+6,cz+f.dz*35);}
   if(ERA=='built'){
     const k0=nearIdx(r,556,368),k1=nearIdx(r,938,712);
@@ -530,7 +565,8 @@ const orbitW=(uv,az,dist,el)=>{const t=THREE.MathUtils.degToRad(az),e=THREE.Math
 const orbitG=(E,N,az,dist,el)=>{const t=THREE.MathUtils.degToRad(az),e=THREE.MathUtils.degToRad(el),c=GW(E,N),ex=+gv('ex').value,gy=ground(c.x,c.z)+2;
   return [new THREE.Vector3(c.x+dist*Math.cos(e)*Math.sin(t),(gy+dist*Math.sin(e))*ex,c.z-dist*Math.cos(e)*Math.cos(t)),new THREE.Vector3(c.x,gy*ex,c.z)];};
 const V={
- station:()=>orbit([665,485],6,238,80,24),
+ station:()=>orbit([665,485],6,228,64,9),
+ facade:()=>orbit([665,485],8,205,74,18),
  bridge:()=>orbit([470,270],7,140,75,14),
  road:()=>{const a=W(470,270),b=W(410,450),ex=+gv('ex').value;return [new THREE.Vector3(b.x,(roadLvl()+1.8)*ex,b.z),new THREE.Vector3(a.x,7*ex,a.z)];},
  shed:()=>orbit([579,292],5,215,62,16),
