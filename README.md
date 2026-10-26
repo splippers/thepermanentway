@@ -14,8 +14,7 @@ For more, see:
 
 - `LORE.md`  
 - `GAMEPLAY_OVERVIEW.md`  
+- `docs/ROADMAP.md` — the working plan, mandates and the Essex vertical slice  
 - `FILM_PITCH.md`  
-- `REPO_STRUCTURE.md`
-
----# thepermanentway
+- `REPO_STRUCTURE.md`  
 

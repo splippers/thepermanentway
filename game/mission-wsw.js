@@ -6,6 +6,29 @@
 const WSW_MISSION = {
   id: 'wsw',
   title: 'Witham to South Woodham Ferrers',
+  mandates: [
+    {
+      id: 'restorationist',
+      name: 'Restorationist',
+      tagline: 'Come what may',
+      desc: 'The line goes back as it was laid. No consultations, no alternatives, no apologies. The cheapest answer is taken and the consequences are recorded, not negotiated.',
+      note: 'Recommended for a first run.',
+    },
+    {
+      id: 'engineer',
+      name: 'Engineer',
+      tagline: 'Every structure is a decision',
+      desc: 'The historical alignment, but bridges, tunnels and stations must be inspected, costed and chosen. Money, heritage and consent all count.',
+      note: 'The balanced brief.',
+    },
+    {
+      id: 'surveyor',
+      name: 'Surveyor',
+      tagline: 'Plan it properly',
+      desc: 'The full brief: land, condition, alignment variants, inquiries. Nothing is assumed. This is the game at its most Brunel.',
+      note: 'The long way round.',
+    },
+  ],
   intro: {
     kicker: 'MISSION 1 · TUTORIAL',
     heading: 'Walk the line before you build it',
@@ -166,6 +189,41 @@ const WSW_MISSION = {
     },
     {
       id: 'cold_norton', name: 'Cold Norton', years: '1889–1939 (goods to the 1950s)', status: 'Closed · site by the B1012',
+      structures: [{
+        id: 'bridge839',
+        name: 'St Stephens Road bridge',
+        asset: 'Bridge 839',
+        place: 'Cold Norton',
+        ngr: 'TQ846999',
+        chainage: '16,670 m from Witham',
+        lat: 51.667978,
+        lon: 0.668747,
+        condition: 'An iron girder bridge with a blue brick parapet. The ground to the north has been raised about 3.5 m to make a front lawn, so the bridge is half-buried and the road rides over a garden.',
+        surveyor: 'The lawn and the made ground are in private ownership. The bridge is not listed, but the parapet is the last original feature of the crossing, and the road cannot close for long.',
+        options: [
+          {
+            id: 'restore',
+            text: 'Buy the lawn, uncover the bridge and restore the iron girder in place.',
+            effect: { fnd: -4, pol: 2, mor: 3 },
+            result: 'The garden is bought, the made ground lifted and the girder shot-blasted. The road rises on its old line. It costs, but the parapet survives and Cold Norton keeps its bridge.',
+            debt: null,
+          },
+          {
+            id: 'replace',
+            text: 'Replace it with a modern concrete bridge and keep the road open.',
+            effect: { fnd: -2, eng: 2, pol: -2, mor: -2 },
+            result: 'The old girder goes for scrap. The new deck carries more and the road stays open, but the blue brick parapet is gone and the village notices.',
+            debt: 'Bridge 839: the iron girder and blue brick parapet were replaced. The garden was left sitting on a concrete deck.',
+          },
+          {
+            id: 'divert',
+            text: 'Divert the line around the bridge on a new embankment.',
+            effect: { eng: 2, fnd: -3, pol: -1, mor: 1 },
+            result: 'The line swings north around the house on a new embankment with a gentler curve. The bridge is left to the garden, and the railway avoids the argument.',
+            debt: 'Bridge 839: the line was diverted around the bridge. The old crossing survives, but the new embankment cut a field in two.',
+          },
+        ],
+      }],
       photos: [
         { key: 'cold_norton_1909', caption: 'Cold Norton station on a postcard posted 7 August 1909.' },
         { key: 'cold_norton_1984', caption: 'The site of Cold Norton station, looking west along the B1012, 1984.' },
@@ -232,6 +290,47 @@ const WSW_MISSION = {
   outro: 'The route is whole again: nine stops, two railways, one line. The Permanent Way draws breath.',
 };
 
+// Restorationist play: the cheapest answer is taken at every stop, without a
+// consultation. The player never sees the cost until the line opens.
+const WSW_AUTO = {
+  witham: {
+    choice: 0,
+    debt: 'Witham: platform 1 was reopened and the operator was told afterwards. The branch bay works; the consultation never happened.',
+  },
+  wickham: {
+    choice: 1,
+    debt: 'Wickham Bishops: the timber trestle viaduct was replaced with steel. The scheduled monument lost its setting; the new bridge is stronger.',
+  },
+  langford: {
+    choice: 0,
+    debt: 'Langford: a simple halt went up on the old platform. Nobody was asked whether they wanted it; nobody objected either.',
+  },
+  maldon_east: {
+    choice: 1,
+    debt: 'Maldon East: a plain new terminus was built beside the old building. The listed station was left to its tenants and the town lost the argument.',
+  },
+  maldon_west: {
+    choice: 2,
+    debt: 'Maldon West: the station was skipped and the line joined by a new curve. The bypass roundabout was left where it was, and the town lost a stop it once had.',
+  },
+  barons_lane: {
+    choice: 1,
+    debt: 'Barons Lane: the halt was rebuilt as it was. The humpback bridge stayed, and the lane kept its airtime.',
+  },
+  cold_norton: {
+    choice: 1,
+    debt: 'Cold Norton: single track, no passing loop, and the cheapest timetable that would fit.',
+  },
+  stow_maries: {
+    choice: 1,
+    debt: 'Stow Maries: the line was driven straight through the nature reserve. The Wildlife Trust found out from the contractors.',
+  },
+  swf: {
+    choice: 1,
+    debt: 'South Woodham Ferrers: the Maldon branch opened as a shuttle. Passengers change at the main line, and the first train ran on a Tuesday.',
+  },
+};
+
 // ---------------------------------------------------------------------------
 // UI
 // ---------------------------------------------------------------------------
@@ -278,7 +377,36 @@ const WSW_MISSION = {
 .dossier-sources a{color:#8a7a5a}
 .dossier-inset{float:right;margin:0 0 6px 10px}
 .dossier-inset svg{display:block}
-@media(max-width:800px){#dossier{right:0;padding:10px}.dossier-grid{grid-template-columns:1fr}.dossier-card{padding:16px}}
+.dossier-mandate{display:inline-block;font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--aurora);border:1px solid rgba(58,157,140,0.5);border-radius:10px;padding:2px 9px;margin-bottom:10px}
+.mandates{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 14px}
+.mandate-card{text-align:left;background:rgba(0,0,0,0.25);border:1px solid rgba(201,168,76,0.25);border-radius:6px;padding:10px 11px;color:var(--parchment);cursor:pointer;font-family:'Cormorant Garamond',serif;transition:all 0.2s}
+.mandate-card:hover{border-color:rgba(201,168,76,0.7);background:rgba(201,168,76,0.08)}
+.mandate-card.sel{border-color:var(--brass-glow);background:rgba(201,168,76,0.14);box-shadow:0 0 0 1px rgba(232,201,90,0.35) inset}
+.mandate-card strong{display:block;font-family:'Cinzel',serif;font-size:13px;color:var(--brass-glow);letter-spacing:1px;margin:2px 0 4px}
+.mandate-card .tag{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--steel)}
+.mandate-card .desc{display:block;font-size:12px;line-height:1.35;color:var(--parchment-dark)}
+.mandate-card .note{display:block;font-size:11px;font-style:italic;color:var(--aurora);margin-top:5px}
+.struct{background:rgba(58,157,140,0.06);border:1px solid rgba(58,157,140,0.35);border-radius:6px;padding:10px 12px;margin:10px 0 14px}
+.struct-head{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:var(--aurora);text-transform:uppercase}
+.struct h3{font-family:'Cinzel',serif;font-size:17px;color:var(--brass-glow);margin:2px 0 1px}
+.struct .meta{font-size:11.5px;color:var(--parchment-dark);font-style:italic;margin-bottom:6px}
+.struct .cond{font-size:13.5px;line-height:1.45;margin-bottom:6px}
+.struct .survey{font-size:12px;line-height:1.4;color:var(--parchment-dark);border-left:2px solid var(--aurora);padding-left:8px;margin-bottom:8px}
+.struct-links{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0 8px}
+.struct-links a{font-size:11px;color:var(--brass-glow);border:1px solid rgba(201,168,76,0.4);border-radius:10px;padding:2px 8px;text-decoration:none}
+.struct-links a:hover{background:rgba(201,168,76,0.15)}
+.struct-links .where{font-size:10.5px;color:var(--steel)}
+.struct-opts{display:flex;flex-direction:column;gap:6px}
+.struct-opts .choice{font-size:13px;padding:8px 11px}
+.struct-done{font-size:13px;line-height:1.45;background:rgba(201,168,76,0.08);border-radius:5px;padding:8px 10px}
+.struct-wait{font-size:13px;font-style:italic;color:var(--parchment-dark);margin:8px 0}
+.debt{border:1px solid rgba(212,93,58,0.5);background:rgba(139,26,26,0.12);border-radius:6px;padding:12px 14px;margin:12px 0}
+.debt h3{font-family:'Cinzel',serif;font-size:13px;letter-spacing:2px;color:var(--ember);margin-bottom:6px;text-transform:uppercase}
+.debt ul{margin:0;padding-left:18px}
+.debt li{font-size:13px;line-height:1.45;margin-bottom:5px;color:var(--parchment-dark)}
+.complete-summary{font-size:14px;line-height:1.5;margin:8px 0}
+.complete-actions{display:flex;justify-content:flex-end;margin-top:12px}
+@media(max-width:800px){#dossier{right:0;padding:10px}.dossier-grid{grid-template-columns:1fr}.dossier-card{padding:16px}.mandates{grid-template-columns:1fr}}
 `;
   document.head.appendChild(css);
 })();
@@ -334,16 +462,168 @@ const WSW = {
 
   close() { document.getElementById('dossier').classList.remove('open'); },
 
+  mandateName() {
+    const id = state.mandate || 'restorationist';
+    const m = WSW_MISSION.mandates.find(x => x.id === id);
+    return m ? m.name : 'Restorationist';
+  },
+
+  mandatePicker() {
+    const sel = this.selectedMandate || state.mandate || 'restorationist';
+    return `<div class="mandates" id="mandatePicker">` + WSW_MISSION.mandates.map(m => `
+      <button class="mandate-card ${m.id === sel ? 'sel' : ''}" data-mandate="${m.id}" aria-pressed="${m.id === sel}">
+        <span class="tag">${this.esc(m.tagline)}</span>
+        <strong>${this.esc(m.name)}</strong>
+        <span class="desc">${this.esc(m.desc)}</span>
+        <span class="note">${this.esc(m.note)}</span>
+      </button>`).join('') + `</div>`;
+  },
+
+  selectMandate(id) {
+    this.selectedMandate = id;
+    document.querySelectorAll('#mandatePicker .mandate-card').forEach(b => {
+      const on = b.dataset.mandate === id;
+      b.classList.toggle('sel', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+  },
+
+  unresolved(stop) {
+    if (!stop.structures) return false;
+    const done = state.mission.structures || {};
+    return stop.structures.some(s => !done[s.id]);
+  },
+
+  // A field check, not a planning canvas: the real coordinates open in Google
+  // Maps and Street View. No key, no overlay, no licence problem.
+  inspect(s) {
+    const q = `${s.lat},${s.lon}`;
+    return `<div class="struct-links">
+      <a href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">Open in Google Maps ↗</a>
+      <a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${q}" target="_blank" rel="noopener">Street View ↗</a>
+      <span class="where">${this.esc(s.ngr)} · ${this.esc(s.chainage)}</span>
+    </div>`;
+  },
+
+  structures(stop) {
+    if (!stop.structures) return '';
+    const mandate = state.mandate || 'restorationist';
+    const done = state.mission.structures || {};
+    return stop.structures.map(s => {
+      const chosen = done[s.id];
+      const opt = s.options.find(o => o.id === chosen);
+      let body;
+      if (mandate === 'restorationist') {
+        body = `<div class="struct-done"><b>Restorationist:</b> ${this.esc(s.options[1].result)} <em>The bill is being kept.</em></div>`;
+      } else if (opt) {
+        body = `<div class="struct-done">${this.esc(opt.result)}${this.fx(opt.effect)}</div>`;
+      } else {
+        body = `<div class="struct-opts">` + s.options.map((o, i) =>
+          `<button class="choice" data-struct="${s.id}" data-i="${i}">${this.esc(o.text)}</button>`).join('') + `</div>`;
+      }
+      return `<div class="struct">
+        <div class="struct-head">Structure · ${this.esc(s.asset)}</div>
+        <h3>${this.esc(s.name)}</h3>
+        <div class="meta">${this.esc(s.place)} · ${this.esc(s.ngr)}</div>
+        <div class="cond">${this.esc(s.condition)}</div>
+        ${mandate === 'surveyor' ? `<div class="survey"><b>Land and consent</b> · ${this.esc(s.surveyor)}</div>` : ''}
+        ${this.inspect(s)}
+        ${body}
+      </div>`;
+    }).join('');
+  },
+
+  applyEffect(effect) {
+    for (const k of ['eng', 'fnd', 'pol', 'mor']) state[k] = clamp(state[k] + (effect[k] || 0));
+    updateStats();
+  },
+
+  chooseStructure(sid, i) {
+    const stop = WSW_MISSION.stops[state.mission.step - 1];
+    const s = stop.structures.find(x => x.id === sid);
+    const opt = s.options[i];
+    this.applyEffect(opt.effect);
+    state.mission.structures[sid] = opt.id;
+    if (opt.debt && !state.mission.debt.includes(opt.debt)) state.mission.debt.push(opt.debt);
+    state.mission.picks.push({ stop: stop.id, structure: sid, choice: opt.id });
+    this.render();
+  },
+
+  // Restorationist: take the cheapest answer, record what it cost, do not stop.
+  autoChoose() {
+    const stop = WSW_MISSION.stops[state.mission.step - 1];
+    const auto = WSW_AUTO[stop.id] || { choice: 0, debt: `${stop.name}: the cheapest option was taken without consultation.` };
+    const c = stop.choices[auto.choice] || stop.choices[0];
+    if (auto.debt && !state.mission.debt.includes(auto.debt)) state.mission.debt.push(auto.debt);
+    if (stop.structures) {
+      for (const s of stop.structures) {
+        state.mission.structures[s.id] = 'auto:' + s.options[1].id;
+        const d = s.options[1].debt;
+        if (d && !state.mission.debt.includes(d)) state.mission.debt.push(d);
+      }
+    }
+    state.mission.picks.push({ stop: stop.id, choice: 'auto', took: c.text });
+    document.getElementById('autoRestore').closest('.dossier-choices').innerHTML = `
+      <div class="dossier-result">${this.esc(c.result)}<div class="dossier-fx"><span class="fx-up">RESTORATIONIST · no consultation</span></div></div>
+      <div class="dossier-actions"><span></span><button class="btn" id="dossierNext">${state.mission.step === WSW_MISSION.stops.length ? 'FACE THE BILL' : 'NEXT STOP ▸'}</button></div>`;
+    document.getElementById('dossierNext').addEventListener('click', () => this.next());
+  },
+
+  renderComplete() {
+    const m = state.mission, debt = m.debt || [];
+    const done = Object.keys(m.structures || {}).length;
+    this.show(`
+      <div class="dossier-kicker">SURVEY COMPLETE · ${this.esc(this.mandateName().toUpperCase())}</div>
+      <h2>The line is whole again</h2>
+      <div class="dossier-meta">${WSW_MISSION.title}</div>
+      <div class="complete-summary">
+        <p>Nine stops, two railways, one line. The Permanent Way draws breath.</p>
+        <p>${done ? `${done} structure ${done === 1 ? 'decision' : 'decisions'} recorded. ` : ''}${m.picks.length} calls made.</p>
+      </div>
+      ${debt.length
+        ? `<div class="debt"><h3>The bill you did not see</h3><ul>${debt.map(d => `<li>${this.esc(d)}</li>`).join('')}</ul>
+           <p style="font-size:12px;color:var(--parchment-dark);margin-top:6px">Memory debt: ${debt.length}. It will surface in the next corridor.</p></div>`
+        : `<div class="struct-done">No hidden bill. Every call was made in the open.</div>`}
+      <div class="complete-actions"><button class="btn" id="openLine">OPEN THE LINE</button></div>
+    `);
+    document.getElementById('openLine').addEventListener('click', () => this.openLine());
+  },
+
+  openLine() {
+    this.close();
+    const id = WSW_MISSION.id;
+    if (state.mission && state.mission.debt && state.mission.debt.length) {
+      state.memoryDebt = (state.memoryDebt || []).concat(state.mission.debt);
+    }
+    state.pending = null;
+    state.mission = null;
+    addNarration(WSW_MISSION.outro, 'system');
+    restoreRoute(id);  // ends the turn
+  },
+
   // step 0 = briefing, 1..N = stops, N+1 = done
   render() {
     const m = state.mission, M = WSW_MISSION;
+    if (!m.structures) m.structures = {};
+    if (!m.debt) m.debt = [];
     if (m.step === 0) return this.renderIntro();
     const idx = m.step - 1, stop = M.stops[idx];
+    const mandate = state.mandate || 'restorationist';
     const photos = stop.photos.map(p => this.figure(p)).join('');
+    const unresolved = this.unresolved(stop);
+    const choices = mandate === 'restorationist'
+      ? `<div class="dossier-choices"><button class="choice" id="autoRestore">RESTORE IT — NO CONSULTATION</button></div>
+         <div class="struct-wait">The cheapest answer will be taken at every stop. The bill is kept until the line opens.</div>`
+      : unresolved
+        ? `<div class="struct-wait">Resolve the structure above before deciding the line.</div>`
+        : `<div class="dossier-choices" id="dossierChoices">
+            ${stop.choices.map((c, i) => `<button class="choice" data-i="${i}">${this.esc(c.text)}</button>`).join('')}
+          </div>`;
     this.show(`
       <div class="dossier-kicker">STOP ${m.step} OF ${M.stops.length} · ${this.esc(stop.status.toUpperCase())}</div>
       <h2>${this.esc(stop.name)}</h2>
       <div class="dossier-meta">${this.esc(stop.years)}</div>
+      <div class="dossier-mandate">Mandate · ${this.esc(this.mandateName())}</div>
       ${this.progress(m.step)}
       <div class="dossier-grid">
         <div class="dossier-photos">${photos}</div>
@@ -353,19 +633,21 @@ const WSW = {
           <div class="today"><b>TODAY</b> · ${this.esc(stop.today)}</div>
           <div class="brunel">${this.esc(stop.brunel)}</div>
           <div class="dossier-coach"><b>MARC EXPLAINS</b>${this.esc(stop.coach)}</div>
-          <div class="dossier-choices" id="dossierChoices">
-            ${stop.choices.map((c, i) => `<button class="choice" data-i="${i}">${this.esc(c.text)}</button>`).join('')}
-          </div>
+          ${this.structures(stop)}
+          ${choices}
           <div class="dossier-actions"><button class="link" id="dossierPause">Pause the survey</button></div>
         </div>
       </div>
       ${this.sources(stop.sources)}`);
     document.querySelectorAll('#dossierChoices .choice').forEach(b => b.addEventListener('click', () => this.choose(+b.dataset.i)));
+    document.querySelectorAll('[data-struct]').forEach(b => b.addEventListener('click', () => this.chooseStructure(b.dataset.struct, +b.dataset.i)));
+    if (document.getElementById('autoRestore')) document.getElementById('autoRestore').addEventListener('click', () => this.autoChoose());
     document.getElementById('dossierPause').addEventListener('click', () => this.pause());
   },
 
   renderIntro() {
     const I = WSW_MISSION.intro;
+    this.selectedMandate = state.mandate || this.selectedMandate || 'restorationist';
     this.show(`
       <div class="dossier-kicker">${I.kicker}</div>
       <h2>${I.heading}</h2>
@@ -374,12 +656,19 @@ const WSW = {
         <div class="dossier-photos">${I.maps.map(p => this.figure(p)).join('')}</div>
         <div class="dossier-text">
           ${I.paras.map(p => `<p>${this.esc(p)}</p>`).join('')}
+          <div class="dossier-mandate">Choose a mandate</div>
+          ${this.mandatePicker()}
           <div class="dossier-coach"><b>MARC EXPLAINS</b>${this.esc(I.coach)}</div>
           <div class="dossier-actions"><button class="link" id="dossierPause">Not yet</button><button class="btn" id="dossierBegin">BEGIN THE SURVEY</button></div>
         </div>
       </div>
       ${this.sources([['Wikipedia: Witham to Maldon branch line', 'https://en.wikipedia.org/wiki/Witham_to_Maldon_branch_line'], ['It\'s About Maldon: the history of the railway lines to Maldon', 'https://www.itsaboutmaldon.co.uk/railway/']])}`);
-    document.getElementById('dossierBegin').addEventListener('click', () => { state.mission.step = 1; this.render(); });
+    document.querySelectorAll('#mandatePicker .mandate-card').forEach(b => b.addEventListener('click', () => this.selectMandate(b.dataset.mandate)));
+    document.getElementById('dossierBegin').addEventListener('click', () => {
+      state.mandate = this.selectedMandate || 'restorationist';
+      state.mission.step = 1;
+      this.render();
+    });
     document.getElementById('dossierPause').addEventListener('click', () => this.pause());
   },
 
@@ -387,13 +676,12 @@ const WSW = {
     const stop = WSW_MISSION.stops[state.mission.step - 1], c = stop.choices[i];
     // apply once: a double click must not apply effects twice
     document.querySelectorAll('#dossierChoices .choice').forEach(b => b.disabled = true);
-    for (const k of ['eng', 'fnd', 'pol', 'mor']) state[k] = clamp(state[k] + (c.effect[k] || 0));
-    updateStats();
+    this.applyEffect(c.effect);
     state.mission.picks.push({ stop: stop.id, choice: i });
     const last = state.mission.step === WSW_MISSION.stops.length;
     document.getElementById('dossierChoices').innerHTML = `
       <div class="dossier-result">${this.esc(c.result)}${this.fx(c.effect)}</div>
-      <div class="dossier-actions"><span></span><button class="btn" id="dossierNext">${last ? 'OPEN THE LINE' : 'NEXT STOP ▸'}</button></div>`;
+      <div class="dossier-actions"><span></span><button class="btn" id="dossierNext">${last ? 'FINISH THE SURVEY' : 'NEXT STOP ▸'}</button></div>`;
     document.getElementById('dossierNext').addEventListener('click', () => this.next());
   },
 
@@ -411,17 +699,15 @@ const WSW = {
   },
 
   finish() {
-    this.close();
-    const id = WSW_MISSION.id;
-    state.pending = null;
-    state.mission = null;
-    addNarration(WSW_MISSION.outro, 'system');
-    restoreRoute(id);  // ends the turn
+    this.renderComplete();
   },
 
   // entry point from attemptRestore
   start() {
-    if (!state.mission) state.mission = { id: WSW_MISSION.id, step: 0, picks: [] };
+    if (!state.mission) state.mission = { id: WSW_MISSION.id, step: 0, picks: [], structures: {}, debt: [] };
+    if (!state.mission.structures) state.mission.structures = {};
+    if (!state.mission.debt) state.mission.debt = [];
+    this.selectedMandate = state.mandate || this.selectedMandate || 'restorationist';
     state.pending = WSW_MISSION.id;
     this.render();
   },

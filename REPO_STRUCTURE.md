@@ -10,12 +10,14 @@ What exists today, and what is planned.
 ├── GAMEPLAY_OVERVIEW.md     Core loop and pillars
 ├── FILM_PITCH.md            Logline, tone, set pieces (casting is a joke, not a plan)
 ├── REPO_STRUCTURE.md
-├── docs/narrative/
-│   ├── character_bios.md
-│   ├── loveinterestarc.md
-│   ├── mary_brunel.md
-│   ├── modernloveinterest.md
-│   └── romantic_themes.md
+├── docs/
+│   ├── ROADMAP.md           Mandates, the Essex vertical slice and the build plan
+│   └── narrative/
+│       ├── character_bios.md
+│       ├── loveinterestarc.md
+│       ├── mary_brunel.md
+│       ├── modernloveinterest.md
+│       └── romantic_themes.md
 ├── index.html               Redirects to game/index.html
 ├── game.html                Redirects to game/game.html
 ├── tools/
@@ -33,9 +35,9 @@ What exists today, and what is planned.
     └── portraits.html       Portrait Studio
 ```
 
-## Planned (not yet written)
+## Planned (see `docs/ROADMAP.md`)
 
-- `docs/narrative/`: `story_arc.md`, `under_infrastructure_metaphysics.md`
+- The Essex vertical slice: corridor map, land parcels, construction weeks, opening ledger
 - `docs/gameplay/`: `core_loop.md`, `mission_design.md`, `ui_ux.md`
 - `docs/engineering/`: `simulation_model.md`, `track_geometry.md`, `hs2_incident_analysis.md`
 - `docs/film/`: `screenplay_outline.md`, `set_piece_design.md`
