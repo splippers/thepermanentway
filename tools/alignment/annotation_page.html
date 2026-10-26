@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maldon LIDAR: help needed</title>
+<style>
+:root{--bg:#06080c;--surf:#0d1118;--edge:#ffffff1a;--text:#e9eef5;--muted:#8892a4;--ok:#4ade80;--bad:#f87171;--warn:#fbbf24;--gold:#f5c842;--maldon:#c47a35}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--text);padding:1.2rem 16px 3rem}
+main{max-width:1100px;margin:0 auto}
+h1{font-size:1.7rem}h1 span{color:var(--gold)}
+.sub{color:var(--muted);margin:.2rem 0 1.2rem}
+h2{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:2rem 0 .7rem}
+a{color:var(--gold)}
+.card{background:var(--surf);border:1px solid var(--edge);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.card h3{font-size:1rem;margin-bottom:.3rem}
+.tag{display:inline-block;font-size:.7rem;padding:1px 8px;border-radius:10px;border:1px solid var(--edge);color:var(--muted);margin-left:6px}
+.tag.hard{color:var(--bad);border-color:#f8717155}.tag.med{color:var(--warn);border-color:#fbbf2455}.tag.easy{color:var(--ok);border-color:#4ade8055}
+ul.tasks{list-style:none;padding:0}
+ul.tasks li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--edge)}
+ul.tasks li:first-child{border-top:0}
+ul.tasks input{margin-top:5px;width:18px;height:18px;flex:none}
+button,select,input[type=text]{font:inherit;background:#161c27;color:var(--text);border:1px solid var(--edge);border-radius:8px;padding:8px 12px}
+button{cursor:pointer}button:hover{border-color:var(--gold)}
+button.go{background:#3a2d06;border-color:var(--gold);color:var(--gold)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+#stage{position:relative;border:1px solid var(--edge);border-radius:10px;overflow:hidden;background:#000}
+canvas{display:block;width:100%;height:min(72vh,max(360px,calc(100vw - 32px)));touch-action:none;cursor:crosshair}
+#readout{font:12px/1.4 ui-monospace,monospace;color:var(--muted);padding:6px 2px}
+#log{font:12px/1.5 ui-monospace,monospace;white-space:pre-wrap;background:#0a0e15;border:1px solid var(--edge);border-radius:8px;padding:10px;max-height:220px;overflow:auto}
+.legend span{display:inline-flex;align-items:center;gap:5px;margin-right:12px;font-size:.8rem;color:var(--muted)}
+.legend i{width:11px;height:11px;border-radius:50%;display:inline-block}
+.note{color:var(--muted);font-size:.85rem}
+footer{margin-top:2.2rem;color:var(--muted);font-size:.8rem;line-height:1.6}
+</style>
+</head>
+<body>
+<main>
+<h1>Maldon LIDAR <span>help needed</span></h1>
+<p class="sub">The route from Witham to South Woodham Ferrers has been traced from 1 m LIDAR. Most of it is solid. These are the places where your eyes beat my data. <a href="../">Maldon Reborn</a></p>
+
+<h2>How this works</h2>
+<div class="card">
+  <ol style="padding-left:1.2rem">
+    <li>Pick a view below. The grey-pink picture is the LIDAR terrain at 1 m per pixel; <b style="color:#7cf26a">green</b> is my traced railway; <b style="color:#ff5be0">pink</b> dots are stations; <b style="color:#4fd8ff">cyan</b> squares are bridges and tunnels from the county survey (good to about 70 m).</li>
+    <li>Tap to place a marker (choose what it is first) or switch to <b>Draw line</b> and tap along the real railway where my trace is wrong.</li>
+    <li>Press <b>Copy results</b> and paste them into the Claude chat. Every tap is converted to National Grid coordinates for me.</li>
+  </ol>
+  <p class="note">Drag to pan, pinch or use +/&minus; to zoom. Your marks are saved in this browser, so you can come back to it.</p>
+</div>
+
+<h2>What I need, in priority order</h2>
+<div id="tasks"></div>
+
+<h2>The annotator</h2>
+<div class="row">
+  <select id="areaSel" aria-label="View"></select>
+  <button id="zin">+</button><button id="zout">&minus;</button><button id="fit">Fit</button>
+  <label class="note"><input type="checkbox" id="showTrace" checked> my trace</label>
+  <label class="note"><input type="checkbox" id="showSurvey" checked> survey structures</label>
+</div>
+<div class="row">
+  <select id="mode"><option value="mark">Mode: place marker</option><option value="line">Mode: draw corrected line</option></select>
+  <select id="kind" aria-label="Marker type"></select>
+  <input type="text" id="label" placeholder="note (optional)" style="flex:1;min-width:140px">
+</div>
+<div id="stage"><canvas id="cv"></canvas></div>
+<div id="readout">Move or tap the map for coordinates</div>
+<div class="legend">
+  <span><i style="background:#7cf26a"></i>my trace</span><span><i style="background:#ff5be0"></i>station</span><span><i style="background:#ffd34d"></i>Maldon East to scale (37 m frontage, 100 m platform, canopy)</span>
+  <span><i style="background:#4fd8ff"></i>survey structure</span><span><i style="background:#ffb454"></i>your marker</span><span><i style="background:#ffe45b"></i>your line</span>
+</div>
+<div class="row">
+  <button id="undo">Undo last</button><button id="clear">Clear this view</button>
+  <button class="go" id="copy">Copy results</button><button id="dl">Download JSON</button>
+</div>
+<div id="log"></div>
+
+<h2>Photos that would help</h2>
+<div class="card">
+  <ul style="padding-left:1.2rem">
+    <li>The brick parapet and humpback at <b>Barons Lane (B1010)</b>, filled-in bridge.</li>
+    <li>The <b>Woodham Road</b> farm-access bridge (broken down), the one that carried the line over the field access.</li>
+    <li>The <b>Honey Pot Lane</b> abutments, both sides.</li>
+    <li>The <b>Church Lane</b> bridge arches at Stow Maries Halt.</li>
+    <li>Anything showing the <b>part-filled bridge</b> you mentioned, with the road name.</li>
+  </ul>
+  <p class="note">Photos I can use need your OK to credit you; say so when you send them and I will name you in the caption and on the credits page.</p>
+</div>
+
+<h2>Data and notes</h2>
+<div class="card">
+  <ul style="padding-left:1.2rem">
+    <li><a href="data/wsw_profile.png">Height profile along the line</a> (the dark-purple stretch is untrusted)</li>
+    <li><a href="data/wsw_centreline.csv">Centreline CSV</a> &middot; <a href="data/wsw_centreline.geojson">GeoJSON</a> &middot; <a href="data/wsw_stations.csv">stations</a> &middot; <a href="data/wsw_structures.csv">structures from the county survey</a></li>
+    <li><a href="data/README.md">How it was made and how far to trust it</a></li>
+  </ul>
+</div>
+
+<footer>
+Terrain: contains Environment Agency information &copy; Environment Agency and/or database right, supplied under the Open Government Licence v3.0 (LIDAR composite DTM, 1 m, 2022).
+Railway line guide: &copy; OpenStreetMap contributors, Open Database Licence.
+Structure details: Kemble and Garwood, <i>The Lost Railways of the Blackwater and Crouch Estuaries</i> (Essex County Council, 2011). Station coordinates from Wikipedia.
+RailMapOnline screenshots were used only as a visual check; none of their data is included.
+</footer>
+</main>
+
+<script>
+const KINDS={
+  viaduct:'Viaduct or large bridge',
+  bridge_ok:'Bridge, still standing',
+  bridge_part:'Bridge, partly filled in',
+  bridge_filled:'Bridge, filled in',
+  bridge_gone:'Bridge, broken down / gone',
+  tunnel:'Tunnel portal',
+  junction:'Junction',
+  station:'Station / platform site',
+  scar_start:'Scar begins',
+  scar_end:'Scar ends',
+  built_over:'Built over here',
+  structure:'Other structure',
+  question:'Not sure / look here'
+};
+const COL={viaduct:'#ffb454',bridge_ok:'#ffb454',bridge_part:'#ffb454',bridge_filled:'#ffb454',bridge_gone:'#ffb454',tunnel:'#ffb454',junction:'#ffb454',station:'#ffb454',scar_start:'#ffb454',scar_end:'#ffb454',built_over:'#ffb454',structure:'#ffb454',question:'#ffb454'};
+// task list: [area, difficulty, title, detail]
+const TASKS=[
+ ['maldon','hard','Is the green line on the real railway between the viaduct and Maldon West?','It now follows the embankment ridge in the LIDAR from the junction north of the town, past the Chelmer viaduct, to Maldon West. Where it is wrong, switch to Draw line and tap along the true course.'],
+ ['maldon','hard','Where exactly was the Chelmer viaduct, and the junction north of Maldon?','The county survey grid references are only good to about 70 m, so my cyan squares are rough. Mark the centre of the river crossing and the point where the Maldon West link left the Witham line.'],
+ ['maldon','med','Maldon West: platforms, tunnel south portal, goods shed','The LIDAR shows a cutting about 40 m wide and 7-8 m deep ending in a sharp wall at about 51.7254, 0.6658, the likely south portal (yard at 1 W Station Yard). The platforms are north of the roundabout under the bypass. Mark the portal, the platforms, the goods shed and the blue-brick wall.'],
+ ['maldon','med','Maldon East and the spur','The terminus is on a spur off the main trunk. The building outline, 37 m frontage, 100 m platform and canopy are drawn to scale, with Ulting to the NW and the engine shed and Long Pond to the SE; move or correct them. Mark the turntable site and where the spur leaves the junction.'],
+ ['swf','hard','South Woodham Ferrers: where does the scar begin and end?','The new town covers the old line. Mark where you can still see it in the ground and where it vanishes under housing. Also the Woodham Road farm-access bridge.'],
+ ['swf','med','Where the branch met the Crouch Valley line','The survey says east of the level crossing. Mark the junction and the old signal box area if you know it.'],
+ ['witham','med','Witham: where the branch left the station and how far it survives','The branch left at the north end of the station and curved east. Mark the start, any stretch you know is intact, and the old Catholic bridge and the A12 bypass bridge.'],
+ ['witham','easy','Witham: other features on the first mile','The River Brain timber viaduct site, Constance Close crossing path.'],
+ ['maldon','easy','Barons Lane, Woodham Road, Honey Pot Lane: bridge states','These are on the main trunk south of Maldon (outside these three views): tell me, as text, which are intact, part-filled, filled in or gone, with the road name. The part-filled bridge you mentioned is the one I could not place.']
+];
+const state={areas:[],ai:0,view:{s:1,ox:0,oy:0},marks:{},lines:{},img:null,pointers:new Map(),last:null,down:null};
+const $=id=>document.getElementById(id),cv=$('cv'),ctx=cv.getContext('2d');
+function load(){try{const j=JSON.parse(localStorage.getItem('maldon_annot')||'{}');state.marks=j.marks||{};state.lines=j.lines||{};}catch(e){}}
+function save(){try{localStorage.setItem('maldon_annot',JSON.stringify({marks:state.marks,lines:state.lines}));}catch(e){}}
+function A(){return state.areas[state.ai];}
+function en(x,y){const a=A();return [Math.round(a.E0+x),Math.round(a.N1-y)];}
+function fit(){const r=cv.getBoundingClientRect(),a=A();state.view.s=Math.min(r.width,r.height)/a.size;state.view.ox=(r.width-a.size*state.view.s)/2;state.view.oy=(r.height-a.size*state.view.s)/2;draw();}
+function sz(){const r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);}
+function scr(x,y){return [x*state.view.s+state.view.ox,y*state.view.s+state.view.oy];}
+function inv(px,py){return [(px-state.view.ox)/state.view.s,(py-state.view.oy)/state.view.s];}
+function draw(){
+  const a=A();if(!a||!state.img)return;const r=cv.getBoundingClientRect();
+  ctx.clearRect(0,0,r.width,r.height);
+  ctx.imageSmoothingEnabled=state.view.s<1;
+  ctx.drawImage(state.img,state.view.ox,state.view.oy,a.size*state.view.s,a.size*state.view.s);
+  // 100 m grid
+  ctx.strokeStyle='#ffffff22';ctx.lineWidth=1;ctx.fillStyle='#ffffffaa';ctx.font='10px ui-monospace,monospace';
+  for(let e=Math.ceil(a.E0/100)*100;e<a.E0+a.size;e+=100){const [x]=scr(e-a.E0,0);ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,r.height);ctx.stroke();if(e%200===0)ctx.fillText(e,x+2,10);}
+  for(let n=Math.ceil((a.N1-a.size)/100)*100;n<a.N1;n+=100){const [,y]=scr(0,a.N1-n);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(r.width,y);ctx.stroke();if(n%200===0)ctx.fillText(n,2,y-2);}
+  (a.shapes||[]).forEach(sh=>{ctx.strokeStyle=sh.kind==='bar'?'#ffd34d':'#4fd8ff';ctx.lineWidth=sh.kind==='bar'?3:1.6;ctx.setLineDash((sh.label.indexOf('platform')===0||sh.label.indexOf('canopy')===0)?[5,3]:[]);ctx.beginPath();sh.pts.forEach((p,i)=>{const [x,y]=scr(p[0],p[1]);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();ctx.setLineDash([]);
+    if(state.view.s>=0.7){const [x,y]=scr(sh.pts[0][0],sh.pts[0][1]);ctx.fillStyle='#ffd34d';ctx.font='10px system-ui';ctx.shadowColor='#000';ctx.shadowBlur=3;ctx.fillText(sh.label,x+6,y-6);ctx.shadowBlur=0;}});
+  if($('showTrace').checked&&a.trace.length){ctx.strokeStyle='#7cf26a';ctx.lineWidth=2;ctx.beginPath();a.trace.forEach((p,i)=>{const [x,y]=scr(p[0],p[1]);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();}
+  a.marks.forEach(m=>{if(m.kind==='survey'&&!$('showSurvey').checked)return;const [x,y]=scr(m.x,m.y);
+    if(m.kind==='station'){ctx.fillStyle='#ff5be0';ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.fill();}else{ctx.fillStyle='#4fd8ff';ctx.fillRect(x-4,y-4,8,8);}
+    ctx.fillStyle='#fff';ctx.font='11px system-ui';ctx.shadowColor='#000';ctx.shadowBlur=3;ctx.fillText(m.label,x+8,y+4);ctx.shadowBlur=0;});
+  const ln=state.lines[a.id]||[];if(ln.length){ctx.strokeStyle='#ffe45b';ctx.lineWidth=2.5;ctx.setLineDash([6,4]);ctx.beginPath();ln.forEach((p,i)=>{const [x,y]=scr(p[0],p[1]);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();ctx.setLineDash([]);
+    ln.forEach(p=>{const [x,y]=scr(p[0],p[1]);ctx.fillStyle='#ffe45b';ctx.beginPath();ctx.arc(x,y,3,0,7);ctx.fill();});}
+  (state.marks[a.id]||[]).forEach((m,i)=>{const [x,y]=scr(m.x,m.y);ctx.fillStyle='#ffb454';ctx.strokeStyle='#000';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,7,0,7);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#fff';ctx.font='11px system-ui';ctx.shadowColor='#000';ctx.shadowBlur=3;ctx.fillText((i+1)+' '+(KINDS[m.kind]||m.kind),x+10,y+4);ctx.shadowBlur=0;});
+}
+function report(){
+  const out=[];
+  state.areas.forEach(a=>{const m=state.marks[a.id]||[],l=state.lines[a.id]||[];if(!m.length&&!l.length)return;
+    out.push('AREA '+a.id+' ('+a.name+')');
+    m.forEach((k,i)=>out.push('  MARK '+(i+1)+' '+k.kind+' E'+k.e+' N'+k.n+(k.label?'  "'+k.label+'"':'')));
+    if(l.length)out.push('  LINE '+l.map(p=>{const q=[Math.round(a.E0+p[0]),Math.round(a.N1-p[1])];return q[0]+','+q[1];}).join(' '));});
+  return out.join('\n');
+}
+function refresh(){const t=report();$('log').textContent=t||'Nothing marked yet.';}
+function addAt(px,py){
+  const a=A(),[x,y]=inv(px,py);if(x<0||y<0||x>a.size||y>a.size)return;
+  if($('mode').value==='line'){(state.lines[a.id]=state.lines[a.id]||[]).push([Math.round(x),Math.round(y)]);}
+  else{const [e,n]=en(x,y);(state.marks[a.id]=state.marks[a.id]||[]).push({kind:$('kind').value,label:$('label').value.trim(),x:Math.round(x),y:Math.round(y),e,n});$('label').value='';}
+  save();refresh();draw();
+}
+function zoomAt(f,px,py){const [x,y]=inv(px,py);state.view.s=Math.max(0.2,Math.min(8,state.view.s*f));state.view.ox=px-x*state.view.s;state.view.oy=py-y*state.view.s;draw();}
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);const r=cv.getBoundingClientRect();state.pointers.set(e.pointerId,[e.clientX-r.left,e.clientY-r.top]);state.down={x:e.clientX,y:e.clientY,moved:false,n:state.pointers.size};state.last=null;});
+cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,a=A();
+  if(a&&state.img){const [x,y]=inv(px,py);if(x>=0&&y>=0&&x<=a.size&&y<=a.size){const [E,N]=en(x,y);$('readout').textContent='E '+E+'  N '+N+'   (British National Grid)';}}
+  if(!state.pointers.has(e.pointerId))return;
+  const prev=state.pointers.get(e.pointerId);state.pointers.set(e.pointerId,[px,py]);
+  if(state.pointers.size===2){const ps=[...state.pointers.values()];const d=Math.hypot(ps[0][0]-ps[1][0],ps[0][1]-ps[1][1]);
+    if(state.last){zoomAt(d/state.last,(ps[0][0]+ps[1][0])/2,(ps[0][1]+ps[1][1])/2);}state.last=d;state.down.moved=true;return;}
+  if(state.pointers.size===1){const dx=px-prev[0],dy=py-prev[1];
+    if(Math.hypot(e.clientX-state.down.x,e.clientY-state.down.y)>6)state.down.moved=true;
+    if(state.down.moved){state.view.ox+=dx;state.view.oy+=dy;draw();}}});
+function up(e){const r=cv.getBoundingClientRect();const wasTap=state.down&&!state.down.moved&&state.down.n===1&&state.pointers.size===1;
+  if(wasTap)addAt(e.clientX-r.left,e.clientY-r.top);state.pointers.delete(e.pointerId);if(!state.pointers.size){state.down=null;state.last=null;}}
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',e=>{state.pointers.delete(e.pointerId);state.down=null;});
+cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect();zoomAt(e.deltaY<0?1.2:1/1.2,e.clientX-r.left,e.clientY-r.top);},{passive:false});
+$('zin').onclick=()=>{const r=cv.getBoundingClientRect();zoomAt(1.4,r.width/2,r.height/2);};
+$('zout').onclick=()=>{const r=cv.getBoundingClientRect();zoomAt(1/1.4,r.width/2,r.height/2);};
+$('fit').onclick=fit;
+['showTrace','showSurvey'].forEach(i=>$(i).onchange=draw);
+$('undo').onclick=()=>{const a=A();if($('mode').value==='line'){(state.lines[a.id]||[]).pop();}else{(state.marks[a.id]||[]).pop();}save();refresh();draw();};
+$('clear').onclick=()=>{const a=A();if(confirm('Clear all your marks and line in this view?')){state.marks[a.id]=[];state.lines[a.id]=[];save();refresh();draw();}};
+$('copy').onclick=async()=>{const t='Maldon LIDAR annotations (British National Grid)\n'+report();try{await navigator.clipboard.writeText(t);$('copy').textContent='Copied';}catch(e){const r=document.createRange();r.selectNodeContents($('log'));getSelection().removeAllRanges();getSelection().addRange(r);$('copy').textContent='Select and copy';}setTimeout(()=>$('copy').textContent='Copy results',2000);};
+$('dl').onclick=()=>{const b=new Blob([JSON.stringify({when:new Date().toISOString(),crs:'EPSG:27700',marks:state.marks,lines:state.lines},null,1)],{type:'application/json'});const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='maldon-annotations.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);};
+function setArea(i){state.ai=i;state.img=null;const img=new Image();img.onload=()=>{state.img=img;fit();};img.src=A().img;$('areaSel').value=i;refresh();}
+function buildTasks(){
+  const done=(()=>{try{return JSON.parse(localStorage.getItem('maldon_tasks')||'{}');}catch(e){return {};}})();
+  $('tasks').innerHTML='<div class="card"><ul class="tasks">'+TASKS.map((t,i)=>`<li><input type="checkbox" data-i="${i}" ${done[i]?'checked':''}><div><b>${t[2]}</b><span class="tag ${t[1]}">${t[1]==='hard'?'needs you':t[1]==='med'?'would help':'if you have time'}</span><br><span class="note">${t[3]}</span><br><button data-area="${t[0]}">Open this view</button></div></li>`).join('')+'</ul></div>';
+  $('tasks').querySelectorAll('input').forEach(c=>c.onchange=()=>{done[c.dataset.i]=c.checked;try{localStorage.setItem('maldon_tasks',JSON.stringify(done));}catch(e){}});
+  $('tasks').querySelectorAll('button').forEach(b=>b.onclick=()=>{const i=state.areas.findIndex(a=>a.id===b.dataset.area);if(i>=0){setArea(i);$('areaSel').scrollIntoView({behavior:'smooth'});}});
+}
+$('kind').innerHTML=Object.entries(KINDS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+fetch('areas.json').then(r=>r.json()).then(j=>{state.areas=j;load();$('areaSel').innerHTML=j.map((a,i)=>`<option value="${i}">${a.name}</option>`).join('');$('areaSel').onchange=e=>setArea(+e.target.value);buildTasks();sz();setArea(0);})
+ .catch(e=>{$('log').textContent='Could not load the map data: '+e;});
+window.addEventListener('resize',()=>{sz();if(state.img)fit();});
+</script>
+</body>
+</html>

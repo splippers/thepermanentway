@@ -262,10 +262,10 @@ function buildWest(){
   const rs=trackLine(WEST_S.map(([x,y])=>[x,y,-99]),railsW,null,WW,offs);
   const nearW=(r,u,v)=>{const q=WW(u,v);let b=0,bd=1e9;r.forEach((p,k)=>{const d=Math.hypot(p.x-q.x,p.z-q.z);if(d<bd){bd=d;b=k;}});return b;};
   const concrete=new THREE.MeshLambertMaterial({color:0x8d8d85});
-  // two platforms either side of the track (the building went in 1969; the platforms are inferred from a 1978 photo)
+  // two platforms either side of the track (the building's demolition date is unsourced; the platforms are inferred from a 1978 photo)
   {const k=idxNear(rn,584205,206510),p=rn[k],f=frame(rn,k),ry=Math.atan2(-f.dz,f.dx),y=p.deck;
    [-1,1].forEach(sd=>{const m=brickMats(65,.92,3.6,0xd9c9b8);m[2]=concrete;box(G,m,p.x+f.nx*sd*(2.4+1.8),y+.46,p.z+f.nz*sd*(2.4+1.8),65,.92,3.6,ry);});
-   label(ERA=='built'?'Maldon West station, 1889: platforms (sizes inferred)':'Maldon West station site: building demolished 1969, platforms inferred',p.x,y+9,p.z);}
+   label(ERA=='built'?'Maldon West station, 1889: platforms (sizes inferred)':'Maldon West station site: platforms inferred',p.x,y+9,p.z);}
   // tunnel portals, bricked up. Spital Road runs over the top.
   {
    {const k=rn.length-1,p=rn[k],f=frame(rn,k),ry=Math.atan2(-f.dz,f.dx),y=p.deck,hh=6.2;
