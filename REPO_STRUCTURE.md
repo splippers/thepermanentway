@@ -12,6 +12,10 @@ What exists today, and what is planned.
 ├── REPO_STRUCTURE.md
 ├── docs/
 │   ├── ROADMAP.md           Mandates, the Essex vertical slice and the build plan
+│   ├── contributing/        Submission intake template for outside material
+│   ├── letters/             Outreach drafts (GER Society, Disused Stations)
+│   ├── engineering/
+│   │   └── traction.md      Classic-styled hydrogen/solar locos: concept and real-world grounding
 │   └── narrative/
 │       ├── character_bios.md
 │       ├── loveinterestarc.md
@@ -47,6 +51,6 @@ What exists today, and what is planned.
 
 - The Essex vertical slice: corridor map, land parcels, construction weeks, opening ledger
 - `docs/gameplay/`: `core_loop.md`, `mission_design.md`, `ui_ux.md`
-- `docs/engineering/`: `simulation_model.md`, `track_geometry.md`, `hs2_incident_analysis.md`
+- `docs/engineering/`: `simulation_model.md`, `track_geometry.md`, `hs2_incident_analysis.md` (`traction.md` already written)
 - `docs/film/`: `screenplay_outline.md`, `set_piece_design.md`
 - `concept_art/`, `prototypes/`, `data/` (maps, lidar, historical, alignments), `tools/` (route planner, cost model)
