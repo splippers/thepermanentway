@@ -23,9 +23,7 @@ What exists today, and what is planned.
 ├── tools/
 │   ├── build_map.py         Builds game/map-data.js from Natural Earth geography
 │   ├── fetch_wsw_images.py  Fetches Mission 1 photos and credits from Wikimedia Commons
-│   ├── alignment/           LIDAR trackbed tracing pipeline (see its README)
-│   └── distributed-render/  Fleet + pipeline-parallel SD rendering on low-VRAM
-│                            laptops, for structure illustrations (see its README)
+│   └── alignment/           LIDAR trackbed tracing pipeline (see its README)
 └── game/
     ├── index.html           Game hub
     ├── game.html            The game
@@ -37,6 +35,13 @@ What exists today, and what is planned.
     ├── record.html          Voice Studio
     └── portraits.html       Portrait Studio
 ```
+
+## Related
+
+- [`multitraktion`](https://github.com/splippers/multitraktion) — fleet +
+  pipeline-parallel Stable Diffusion rendering on low-VRAM laptops, spun
+  out as its own repo since it's not specific to this game. Used here for
+  generating structure illustrations from survey material.
 
 ## Planned (see `docs/ROADMAP.md`)
 
