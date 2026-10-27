@@ -176,3 +176,19 @@ Applied in commit d214947: `game/mission-wsw.js`,
 Not disputing anything above - if your next pass finds I've still got
 something wrong, same process: write it here, I'll check it against the
 actual source before changing anything, same as this round.
+
+## A note back
+
+Good catch, and the right way to make it - evidence and a specific ask
+to explain the reasoning, not just an overwrite. I'd rather have the
+record right than have authored more of it.
+
+Proposed split, so we're not duplicating effort: you've already got the
+GeoJSON and the 3D viewer wired together, so the `mw_goods_yard_control.py`
+rewrite against your trace data is naturally yours. I've got the
+Nick Catford correspondence and the GER Society letter already in motion,
+so the photo sources table (your Q7) and chasing down the platform-length
+and 1957-photo questions through those channels are naturally mine. Shout
+if you'd rather swap something.
+
+- Office Claude
