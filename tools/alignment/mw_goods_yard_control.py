@@ -28,6 +28,21 @@ Geometry sources, in order of trust:
 Expect +/-5m on position from pixel-reading precision; shed and platform
 SIZES are now the sketch's real dimensions, not plan-pixel guesses.
 
+Headshunt: digitised from the 1897 plan (14 waypoints, branch to level
+with the shed's south end) = 174.6m; the sketch gives 1080ft (329.2m)
+total, so the remaining 154.6m is extrapolated in a straight line on the
+last digitised bearing, not traced from a plan - lower confidence than
+the rest.
+
+Station building and footbridge: NOT measured anywhere in the sources
+used so far. refmaterial/Maldon/maldon-west-25_o.jpg shows a booking
+office/tower at road level directly over the tunnel's north portal, with
+twin glazed covered stairways down to each platform, and the ECC survey
+confirms "approached by a covered footbridge from the road" - but no
+plan gives its footprint. Drawn here as a placeholder box at a plausible
+size, clearly separable in the output; replace if a dimensioned source
+turns up.
+
 Usage: mw_goods_yard_control.py [--out FILE] [--size N]
 """
 import argparse
@@ -68,6 +83,19 @@ TRACK_B = [(584219.0, 206412.0), (584225.0, 206320.0), (584229.0, 206260.0)]
 # Shed siding spur, splitting off track A towards the shed
 SIDING = [(584215.0, 206360.0), (584213.8, 206293.2)]
 
+# Headshunt/coal road: digitised waypoints from the 1897 plan (branch
+# from the main line, loop west and south past the shed's west side -
+# matching the loading door there), then one extrapolated point to reach
+# the sketch's 1080ft total (see module docstring).
+HEADSHUNT = [
+    (584219.2, 206396.5), (584205.9, 206389.7), (584190.0, 206384.4),
+    (584179.4, 206380.1), (584170.4, 206371.6), (584164.6, 206359.5),
+    (584162.4, 206346.2), (584164.6, 206333.0), (584173.0, 206320.8),
+    (584184.7, 206311.8), (584196.9, 206305.4), (584203.2, 206295.9),
+    (584204.8, 206282.6), (584205.9, 206272.0),
+    (584221.8, 206118.3),  # extrapolated - not on the digitised plan
+]
+
 # Spital Road tunnel portals (see mission-wsw.js discussion - plan
 # reading gives ~29m gap, close to 66ft/21m, not 66yd/60m)
 NORTH_PORTAL = (584211.2, 206416.2)
@@ -86,6 +114,18 @@ _CENTRELINE = [  # chainage, easting, northing - from wsw_centreline.csv
     (9890.0, 584196.0, 206435.8),
 ]
 _PLATFORM_OFFSET = 4.0  # m, running-line to platform edge, each side
+
+# Station building (booking office/tower): UNMEASURED - see module
+# docstring. Placed at road level over the north portal, matching
+# maldon-west-25_o.jpg; size is a plausible guess, not a source figure.
+_STATION_CX, _STATION_CY = 584211.2, 206418.0
+_STATION_W, _STATION_L = 7.0, 14.0
+STATION_BLDG = [
+    (_STATION_CX - _STATION_W / 2, _STATION_CY + _STATION_L / 2),
+    (_STATION_CX + _STATION_W / 2, _STATION_CY + _STATION_L / 2),
+    (_STATION_CX + _STATION_W / 2, _STATION_CY - _STATION_L / 2),
+    (_STATION_CX - _STATION_W / 2, _STATION_CY - _STATION_L / 2),
+]
 
 
 def _offset_line(points, offset):
@@ -108,8 +148,14 @@ def _offset_line(points, offset):
 PLATFORM_DOWN = _offset_line(_CENTRELINE, _PLATFORM_OFFSET)
 PLATFORM_UP = _offset_line(_CENTRELINE, -_PLATFORM_OFFSET)
 
-ALL_POINTS = (SHED + DOCK + TRACK_A + TRACK_B + SIDING
-              + [NORTH_PORTAL, SOUTH_PORTAL] + PLATFORM_DOWN + PLATFORM_UP)
+# Twin covered footbridge stairways, station building down to each
+# platform's south (road) end - schematic, see STATION_BLDG note above.
+FOOTBRIDGE_DOWN = [(_STATION_CX, _STATION_CY), PLATFORM_DOWN[-1]]
+FOOTBRIDGE_UP = [(_STATION_CX, _STATION_CY), PLATFORM_UP[-1]]
+
+ALL_POINTS = (SHED + DOCK + TRACK_A + TRACK_B + SIDING + HEADSHUNT
+              + [NORTH_PORTAL, SOUTH_PORTAL] + PLATFORM_DOWN + PLATFORM_UP
+              + STATION_BLDG + FOOTBRIDGE_DOWN + FOOTBRIDGE_UP)
 
 
 def main() -> None:
@@ -141,8 +187,12 @@ def main() -> None:
     for track in (TRACK_A, TRACK_B):
         d.line([px(p) for p in track], fill="black", width=3)
     d.line([px(p) for p in SIDING], fill="black", width=3)
+    d.line([px(p) for p in HEADSHUNT], fill="black", width=2)
     d.line([px(p) for p in PLATFORM_DOWN], fill="black", width=3)
     d.line([px(p) for p in PLATFORM_UP], fill="black", width=3)
+    d.polygon([px(p) for p in STATION_BLDG], outline="black", width=4)
+    d.line([px(p) for p in FOOTBRIDGE_DOWN], fill="black", width=2)
+    d.line([px(p) for p in FOOTBRIDGE_UP], fill="black", width=2)
 
     # mark the portals as short crossbars over the line, for the prompt
     # to anchor "tunnel mouth" detail on
