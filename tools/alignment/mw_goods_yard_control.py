@@ -1,174 +1,59 @@
 #!/usr/bin/env python3
-"""SUPERSEDED, pending a rewrite against better data. The shed/dock
-position and size below were read from maldon3d/map_w.jpg via an
-uncalibrated registration transform and were found to be wrong by about
-170m (see docs/notes/NOTE_FOR_OFFICE_CLAUDE.md and
-docs/research/maldon_west_corrections.md): a parallel, georeferenced
-trace of the OS 25-inch map put the real shed, dock, signal box,
-platforms and tunnel portals in different places, in
-data/alignments/mw_1890s_footprints.geojson. The headshunt and tunnel
-portal points below are from the same uncalibrated reading and should
-be treated the same way until this script is rebuilt to read the
-GeoJSON instead. Kept for now as a record of the method, not as a
-source of positions.
+"""Builds a ControlNet conditioning image (line drawing) of the Maldon West
+station, tunnel and goods yard, for the multitraktion illustration pipeline.
 
-Builds a ControlNet conditioning image (canny/lineart style) for the
-Maldon West station, platforms and goods yard.
+Geometry comes from one place: the georeferenced footprints traced from the
+Ordnance Survey 25-inch map of Essex (1890s; NLS tiles, about 1-2 m) in
+data/alignments/mw_1890s_footprints.geojson, plus the map-snapped line through
+the station in maldon3d/mw_footprints.js. Nothing here is read from the
+sketch (MWSketch.jpg is not to scale against itself) or from the 1897 plan
+overlay (its registration was up to ~170 m out in the yard).
 
-Geometry sources, in order of trust:
-1. refmaterial/Maldon/MWSketch.jpg - a dimensioned engineer's/BR-era
-   sketch: goods shed 21ft x 34ft, platforms 324ft each (Up and Down),
-   coal road/headshunt ~1080-1085ft, "End & Side Dock" 12ft x 16ft.
-   Real measurements - this is what sizes everything below.
-2. The ECC field survey (Kemble and Garwood, 2011; see mission-wsw.js
-   sources), "Goods Shed, Maldon West" entry: "two blind arcades and one
-   rebuilt and raised to a square profile facing to S, a small round
-   window above central arcade, similar blind arcades with a central
-   loading door facing to W, c.1889" - confirms the sketch's shed as the
-   surviving building, gives orientation (loading door faces W).
-3. maldon3d/map_w.jpg (1897 OS plan, same source as the ECC survey's own
-   "Map 38"), pixel coordinates read by eye against a grid overlay,
-   converted to BNG via the viewer's registration:
-       E = 583925 + 0.53 * u
-       N = 206590 - 0.53 * v
-   Used for POSITION (centroid, portal locations, track alignment) since
-   the sketch isn't itself geo-registered; the plan's own tolerance is
-   +/-25m (see maldon3d/index.html's caption), tightened a bit by cross-
-   checking the platform run against data/alignments/wsw_centreline.csv
-   (a 324 ft run from the inferred north portal lands within ~0.5 m of
-   the centreline's own chainage-to-distance figure).
+An earlier version of this script placed the goods shed about 170 m too far
+north from a plan-pixel reading; see docs/research/maldon_west_corrections.md.
 
-Expect +/-5m on position from pixel-reading precision; shed and platform
-SIZES are now the sketch's real dimensions, not plan-pixel guesses.
+What is and is not drawn:
+- Drawn from the trace: both platforms, canopies, station buildings, booking
+  office, road-bridge strip, tunnel south-portal structure, goods shed (about
+  46 x 14 m), shed office, signal box, weighing machine, end-and-side dock,
+  roadside houses, the cutting top edges and the line.
+- Not drawn, because not traced: individual tracks, sidings, the headshunt,
+  the twin covered stairways (only the stair strips on the map), the tower.
 
-Headshunt: digitised from the 1897 plan (14 waypoints, branch to level
-with the shed's south end) = 174.6m; the sketch gives 1080ft (329.2m)
-total, so the remaining 154.6m is extrapolated in a straight line on the
-last digitised bearing, not traced from a plan - lower confidence than
-the rest.
+Usage: mw_goods_yard_control.py [--part station|yard|all] [--out FILE] [--size N]
+       [--margin M] [--no-cutting] [--no-houses]
 
-Station building and footbridge: NOT measured anywhere in the sources
-used so far. refmaterial/Maldon/maldon-west-25_o.jpg shows a booking
-office/tower at road level directly over the tunnel's north portal, with
-twin glazed covered stairways down to each platform, and the ECC survey
-confirms "approached by a covered footbridge from the road" - but no
-plan gives its footprint. Drawn here as a placeholder box at a plausible
-size, clearly separable in the output; replace if a dimensioned source
-turns up.
-
-Usage: mw_goods_yard_control.py [--out FILE] [--size N]
+The site is 700 m long and under 150 m wide, so "all" is a thin strip; use
+--part station (platforms, booking office, tunnel mouth) or --part yard (goods
+shed, dock, signal box, south portal) for something closer to square.
 """
 import argparse
-import math
+import json
+import pathlib
 
 from PIL import Image, ImageDraw
 
-FT = 0.3048  # metres per foot
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+GEOJSON = ROOT / "data" / "alignments" / "mw_1890s_footprints.geojson"
+AXIS_JS = ROOT / "maldon3d" / "mw_footprints.js"
 
-# Goods shed: 21ft x 34ft (MWSketch.jpg), centred on the plan-read
-# position, long axis roughly N-S per the plan/photos (loading door on
-# the W long side, per the ECC survey description).
-_SHED_CX, _SHED_CY = 584213.8, 206282.0  # centroid, from the plan reading
-_SHED_W, _SHED_L = 21 * FT, 34 * FT
-SHED = [
-    (_SHED_CX - _SHED_W / 2, _SHED_CY + _SHED_L / 2),
-    (_SHED_CX + _SHED_W / 2, _SHED_CY + _SHED_L / 2),
-    (_SHED_CX + _SHED_W / 2, _SHED_CY - _SHED_L / 2),
-    (_SHED_CX - _SHED_W / 2, _SHED_CY - _SHED_L / 2),
-]
-
-# End & Side Dock, 12ft x 16ft (MWSketch.jpg), just south of the shed
-_DOCK_CX, _DOCK_CY = 584218.0, 206278.0
-_DOCK_W, _DOCK_L = 12 * FT, 16 * FT
-DOCK = [
-    (_DOCK_CX - _DOCK_W / 2, _DOCK_CY + _DOCK_L / 2),
-    (_DOCK_CX + _DOCK_W / 2, _DOCK_CY + _DOCK_L / 2),
-    (_DOCK_CX + _DOCK_W / 2, _DOCK_CY - _DOCK_L / 2),
-    (_DOCK_CX - _DOCK_W / 2, _DOCK_CY - _DOCK_L / 2),
-]
-
-# Running lines through the yard throat (plan pixels ~578-605 u band),
-# approximated as two parallel tracks - the loop/headshunt serving the
-# shed siding, not a precise track-by-track trace.
-TRACK_A = [(584212.0, 206412.0), (584218.0, 206320.0), (584222.0, 206260.0)]
-TRACK_B = [(584219.0, 206412.0), (584225.0, 206320.0), (584229.0, 206260.0)]
-
-# Shed siding spur, splitting off track A towards the shed
-SIDING = [(584215.0, 206360.0), (584213.8, 206293.2)]
-
-# Headshunt/coal road: digitised waypoints from the 1897 plan (branch
-# from the main line, loop west and south past the shed's west side -
-# matching the loading door there), then one extrapolated point to reach
-# the sketch's 1080ft total (see module docstring).
-HEADSHUNT = [
-    (584219.2, 206396.5), (584205.9, 206389.7), (584190.0, 206384.4),
-    (584179.4, 206380.1), (584170.4, 206371.6), (584164.6, 206359.5),
-    (584162.4, 206346.2), (584164.6, 206333.0), (584173.0, 206320.8),
-    (584184.7, 206311.8), (584196.9, 206305.4), (584203.2, 206295.9),
-    (584204.8, 206282.6), (584205.9, 206272.0),
-    (584221.8, 206118.3),  # extrapolated - not on the digitised plan
-]
-
-# Spital Road tunnel portals (see mission-wsw.js discussion - plan
-# reading gives ~29m gap, close to 66ft/21m, not 66yd/60m)
-NORTH_PORTAL = (584211.2, 206416.2)
-SOUTH_PORTAL = (584219.2, 206388.6)
-
-# Platforms: 324ft each (MWSketch.jpg), Up and Down, running from the
-# north portal back towards Witham along the real centreline (see
-# data/alignments/wsw_centreline.csv, chainage ~9789 to ~9890 - this
-# matches 324ft to within ~0.5m, independent of the sketch).
-_CENTRELINE = [  # chainage, easting, northing - from wsw_centreline.csv
-    (9790.0, 584174.4, 206533.4), (9800.0, 584176.4, 206523.6),
-    (9810.0, 584178.4, 206513.8), (9820.0, 584180.4, 206504.0),
-    (9830.0, 584182.6, 206494.2), (9840.0, 584184.7, 206484.5),
-    (9850.0, 584186.9, 206474.7), (9860.0, 584189.1, 206465.0),
-    (9870.0, 584191.4, 206455.2), (9880.0, 584193.7, 206445.5),
-    (9890.0, 584196.0, 206435.8),
-]
-_PLATFORM_OFFSET = 4.0  # m, running-line to platform edge, each side
-
-# Station building (booking office/tower): UNMEASURED - see module
-# docstring. Placed at road level over the north portal, matching
-# maldon-west-25_o.jpg; size is a plausible guess, not a source figure.
-_STATION_CX, _STATION_CY = 584211.2, 206418.0
-_STATION_W, _STATION_L = 7.0, 14.0
-STATION_BLDG = [
-    (_STATION_CX - _STATION_W / 2, _STATION_CY + _STATION_L / 2),
-    (_STATION_CX + _STATION_W / 2, _STATION_CY + _STATION_L / 2),
-    (_STATION_CX + _STATION_W / 2, _STATION_CY - _STATION_L / 2),
-    (_STATION_CX - _STATION_W / 2, _STATION_CY - _STATION_L / 2),
-]
+HOUSES = {"house_nw", "house_w2", "house_e", "cottage"}
+PARTS = {"station": (206320, 206570), "yard": (205990, 206350), "all": (0, 1e9)}
+HEAVY = {"goods_shed", "booking_office", "east_building", "west_building"}
 
 
-def _offset_line(points, offset):
-    """Offset a polyline perpendicular to its local direction."""
-    out = []
-    for i, (_, e, n) in enumerate(points):
-        if i == 0:
-            de, dn = points[1][1] - e, points[1][2] - n
-        elif i == len(points) - 1:
-            de, dn = e - points[i - 1][1], n - points[i - 1][2]
-        else:
-            de = points[i + 1][1] - points[i - 1][1]
-            dn = points[i + 1][2] - points[i - 1][2]
-        length = math.hypot(de, dn) or 1.0
-        nx, ny = -dn / length, de / length  # perpendicular, unit
-        out.append((e + nx * offset, n + ny * offset))
-    return out
+def load_features():
+    polys, lines = {}, {}
+    for f in json.loads(GEOJSON.read_text())["features"]:
+        name, bng = f["properties"]["name"], [tuple(p) for p in f["properties"]["bng"]]
+        (polys if f["geometry"]["type"] == "Polygon" else lines)[name] = bng
+    return polys, lines
 
 
-PLATFORM_DOWN = _offset_line(_CENTRELINE, _PLATFORM_OFFSET)
-PLATFORM_UP = _offset_line(_CENTRELINE, -_PLATFORM_OFFSET)
-
-# Twin covered footbridge stairways, station building down to each
-# platform's south (road) end - schematic, see STATION_BLDG note above.
-FOOTBRIDGE_DOWN = [(_STATION_CX, _STATION_CY), PLATFORM_DOWN[-1]]
-FOOTBRIDGE_UP = [(_STATION_CX, _STATION_CY), PLATFORM_UP[-1]]
-
-ALL_POINTS = (SHED + DOCK + TRACK_A + TRACK_B + SIDING + HEADSHUNT
-              + [NORTH_PORTAL, SOUTH_PORTAL] + PLATFORM_DOWN + PLATFORM_UP
-              + STATION_BLDG + FOOTBRIDGE_DOWN + FOOTBRIDGE_UP)
+def load_axis():
+    txt = AXIS_JS.read_text()
+    data = json.loads(txt[txt.index("=") + 1:].rstrip().rstrip(";"))
+    return [tuple(p) for p in data["axis"]]
 
 
 def main() -> None:
@@ -176,46 +61,43 @@ def main() -> None:
     p.add_argument("--out", default="mw_goods_yard_control.png")
     p.add_argument("--size", type=int, default=1024)
     p.add_argument("--margin", type=float, default=8.0, help="metres of padding")
+    p.add_argument("--part", choices=sorted(PARTS), default="all")
+    p.add_argument("--no-cutting", action="store_true", help="omit the cutting top edges")
+    p.add_argument("--no-houses", action="store_true", help="omit the roadside houses")
     args = p.parse_args()
 
-    es = [pt[0] for pt in ALL_POINTS]
-    ns = [pt[1] for pt in ALL_POINTS]
+    polys, lines = load_features()
+    if args.no_houses:
+        polys = {k: v for k, v in polys.items() if k not in HOUSES}
+    if args.no_cutting:
+        lines = {}
+    axis = load_axis()
+    lo, hi = PARTS[args.part]
+    inside = lambda q: lo <= q[1] <= hi
+    polys = {k: v for k, v in polys.items() if inside(v[0]) or inside(v[len(v) // 2])}
+    lines = {k: [q for q in v if inside(q)] for k, v in lines.items()}
+    axis = [q for q in axis if inside(q)]
+
+    pts = [q for v in polys.values() for q in v] + [q for v in lines.values() for q in v] + axis
+    es, ns = [q[0] for q in pts], [q[1] for q in pts]
     e0, e1 = min(es) - args.margin, max(es) + args.margin
     n0, n1 = min(ns) - args.margin, max(ns) + args.margin
     scale = args.size / max(e1 - e0, n1 - n0)
 
-    def px(pt):
-        e, n = pt
-        x = (e - e0) * scale
-        y = (n1 - n) * scale  # flip so north is up
-        return (x, y)
+    def px(q):
+        return ((q[0] - e0) * scale, (n1 - q[1]) * scale)  # north up
 
-    img_w = round((e1 - e0) * scale)
-    img_h = round((n1 - n0) * scale)
-    img = Image.new("RGB", (img_w, img_h), "white")
+    img = Image.new("RGB", (round((e1 - e0) * scale), round((n1 - n0) * scale)), "white")
     d = ImageDraw.Draw(img)
-
-    d.polygon([px(p) for p in SHED], outline="black", width=4)
-    d.polygon([px(p) for p in DOCK], outline="black", width=3)
-    for track in (TRACK_A, TRACK_B):
-        d.line([px(p) for p in track], fill="black", width=3)
-    d.line([px(p) for p in SIDING], fill="black", width=3)
-    d.line([px(p) for p in HEADSHUNT], fill="black", width=2)
-    d.line([px(p) for p in PLATFORM_DOWN], fill="black", width=3)
-    d.line([px(p) for p in PLATFORM_UP], fill="black", width=3)
-    d.polygon([px(p) for p in STATION_BLDG], outline="black", width=4)
-    d.line([px(p) for p in FOOTBRIDGE_DOWN], fill="black", width=2)
-    d.line([px(p) for p in FOOTBRIDGE_UP], fill="black", width=2)
-
-    # mark the portals as short crossbars over the line, for the prompt
-    # to anchor "tunnel mouth" detail on
-    for portal in (NORTH_PORTAL, SOUTH_PORTAL):
-        x, y = px(portal)
-        d.line([(x - 15, y), (x + 15, y)], fill="black", width=5)
-
+    for name, v in polys.items():
+        d.polygon([px(q) for q in v], outline="black", width=4 if name in HEAVY else 3)
+    for v in lines.values():
+        d.line([px(q) for q in v], fill="black", width=2)
+    d.line([px(q) for q in axis], fill="black", width=3)
     img.save(args.out)
-    print(f"wrote {args.out} ({img_w}x{img_h}, "
-          f"{e1-e0:.0f}m x {n1-n0:.0f}m world extent, {scale:.2f} px/m)")
+    print(f"{args.out}: {img.size[0]}x{img.size[1]}, {len(polys)} polygons, "
+          f"{len(lines)} edge lines, axis of {len(axis)} points; "
+          f"E {e0:.0f}-{e1:.0f}, N {n0:.0f}-{n1:.0f}")
 
 
 if __name__ == "__main__":
