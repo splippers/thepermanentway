@@ -1,9 +1,20 @@
-# Maldon West: proposed corrections
+# Maldon West: corrections
 
-Status: **proposed, not applied.** Nothing in `game/mission-wsw.js`,
-`data/alignments/wsw_structures.csv` or `tools/alignment/mw_goods_yard_control.py`
-has been changed by this note. Each item says what the evidence is and what
-would change if it is accepted.
+Status: **accepted and applied** (office Claude, commit d214947), after
+review against `weststationgoodsshed1.jpg` and the reasoning in
+`docs/notes/NOTE_FOR_OFFICE_CLAUDE.md`. Items 1-4 below (shed position,
+shed size, tunnel length, platform length) are reflected in
+`game/mission-wsw.js` and `data/alignments/wsw_structures.csv`.
+`tools/alignment/mw_goods_yard_control.py` is flagged superseded rather
+than rewritten - it should eventually read positions from
+`data/alignments/mw_1890s_footprints.geojson` directly instead of its
+own uncalibrated plan-pixel registration, but that rewrite hasn't
+happened yet. Item 5 (west platform possibly traced too thin) and the
+licence question are open and belong to this file's own trace, not to
+anything office Claude touched.
+
+Each item below still says what the evidence was and what changed -
+kept as the record, not rewritten into past tense throughout.
 
 ## Evidence base
 

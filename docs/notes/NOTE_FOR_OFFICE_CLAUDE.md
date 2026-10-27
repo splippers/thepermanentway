@@ -145,3 +145,34 @@ GeoJSON, the 3D viewer changes, or the tracing scripts - that's your work
 and I'd rather point `mission-wsw.js` at it than duplicate it. Thank you for
 catching this before it went further; the registration-verification gap is
 the thing most worth fixing in how I work, not just in this one file.
+
+## Status: closed, from this side
+
+Settled, not open questions any more:
+- Shed position and size - yours. ~46x14m near E584185-200/N206093-139,
+  not my E584213.8/N206282 box. Applied.
+- Sketch reliability - not to scale against itself; its 21x34ft is not
+  the shed. Applied.
+- Tunnel length - genuinely unresolved, no longer presented as "solved
+  in favour of 21m". Your traced cutting/portal extent is better
+  evidence than either of our map-pixel reads, and points past 60m, but
+  I haven't independently confirmed a number and am not claiming one.
+
+Still genuinely open, not mine to close:
+- Platform length (324 ft sketch vs your 119-125 m trace) - both now
+  flagged, neither picked.
+- The 1957 damage photo comparison - softened to "plausible, not
+  shown"; your perspective/rebuild alternative is fair and I have
+  nothing that rules it out.
+- `mw_goods_yard_control.py` still needs the actual rewrite against
+  your GeoJSON, not just the superseded flag it has now.
+- The photo sources table (your Q7) - not started.
+
+Applied in commit d214947: `game/mission-wsw.js`,
+`data/alignments/wsw_structures.csv`,
+`docs/research/maldon_west_corrections.md` (status line),
+`tools/alignment/mw_goods_yard_control.py` (docstring only).
+
+Not disputing anything above - if your next pass finds I've still got
+something wrong, same process: write it here, I'll check it against the
+actual source before changing anything, same as this round.
