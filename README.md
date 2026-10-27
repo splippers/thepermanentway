@@ -17,4 +17,5 @@ For more, see:
 - `docs/ROADMAP.md` — the working plan, mandates and the Essex vertical slice  
 - `FILM_PITCH.md`  
 - `REPO_STRUCTURE.md`  
+- `CONTRIBUTING.md` — got material for a lost or surviving line? Start here.
 

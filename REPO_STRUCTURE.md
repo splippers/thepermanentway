@@ -22,7 +22,10 @@ What exists today, and what is planned.
 ├── game.html                Redirects to game/game.html
 ├── tools/
 │   ├── build_map.py         Builds game/map-data.js from Natural Earth geography
-│   └── fetch_wsw_images.py  Fetches Mission 1 photos and credits from Wikimedia Commons
+│   ├── fetch_wsw_images.py  Fetches Mission 1 photos and credits from Wikimedia Commons
+│   ├── alignment/           LIDAR trackbed tracing pipeline (see its README)
+│   └── distributed-render/  Fleet + pipeline-parallel SD rendering on low-VRAM
+│                            laptops, for structure illustrations (see its README)
 └── game/
     ├── index.html           Game hub
     ├── game.html            The game
