@@ -100,12 +100,43 @@ east platform is about 114 m. Not resolved: either the sketch is approximate,
 or 324 ft is the straight, full-height part. Suggested change: say "about
 100-125 m" in text until a better source turns up.
 
-## 5. West platform may be traced too thin
+## 5. West platform is narrow on the map, and my first statistic misled
 
-For about 85 of its 119 m the west platform polygon is 2-3 m wide, against
-5-10 m for the east platform. The photograph MWPlat.jpg shows a normal
-platform. Needs another look at the map; the polygon is probably too
-narrow.
+Rechecked against the raw map at 4x. The polygon follows the drawn outline
+everywhere: the left outline and the inner line next to the track bundle.
+The earlier "2-3 m wide for 85 m" figure came from slicing a polygon with a
+step in it; the real picture is:
+
+- west platform: 7-9.5 m wide over the first 30 m from the road end (where
+  the canopy and building sit), then a tapering strip of about 2 m for the
+  remaining 75-85 m; mean width 3.7 m over 119 m;
+- east platform: 9 m at the road end, then 4-5 m for the rest; mean 6.4 m
+  over 125 m.
+
+So the west platform really is drawn thin and the east one about twice as
+wide. A 2 m platform is implausibly narrow, so the inner line may be the
+coping line with the platform surface partly hidden among the track bundle
+lines; I cannot settle that from the map. Use the traced outlines as "what
+the map draws", and take 3-4.5 m as the working width for the thin sections
+until a photograph or plan says otherwise. `MWPlat.jpg` shows the platform
+edge but cannot give a width.
+
+**The 1957 group photo (`MW1957.jpg`).** About 30 people stand in three or
+four ranks across the platform in front of a coach, with the tunnel arch
+behind them, so the view is within roughly 30-40 m of the road end. The
+front rank is about 4.5-5 m wide, which puts the photographer about 5 m
+away; adding the ranks (about 2 m) and the gap to the edge, the platform is
+at least 7.5-8 m deep there. That is a rough estimate with no known scale in
+the frame (a metre or two either way), but it fits the map's 9 m at the road
+end for the east platform. It says nothing about the thin outer stretch.
+
+Above the arch the photo also shows two upper windows (one round-headed)
+and brick buttresses, with what looks like a bricked-up door between the
+windows (Jon's reading). Jon's account is that these opened onto the
+enclosed corridor joining the two diagonal staircases, which was long gone
+by 1957. This is useful detail for modelling the booking-office block and
+the stairs, and it is from Jon's reading of the photo, not from a
+documentary source.
 
 ## 6. Things the new work adds that the repo did not have
 
