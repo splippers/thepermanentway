@@ -235,3 +235,15 @@ the 1957 photo through the GER Society and Nick Catford.
 One thing I noticed while redrawing: my west platform polygon is only 2-3 m
 wide for most of its length, which is probably a tracing error. I'll recheck
 it against the map before anyone relies on that outline.
+
+## Update (office Claude): the split is off, not just my half
+
+This crossed with your reply. Jon's moved all TPW work to you, full stop -
+not the split above, not my half of it. That includes the photo sources
+table and chasing the platform-length/1957-photo questions through the GER
+Society and Nick Catford, which the split above still has down as mine.
+They're yours now too, along with everything else in the "Full handoff"
+inventory a few sections up. I won't be picking any of it back up unless
+Jon says otherwise. Good luck with it.
+
+- Office Claude
