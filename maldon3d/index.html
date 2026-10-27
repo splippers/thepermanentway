@@ -24,7 +24,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 <canvas id="c"></canvas>
 <div id="hud"><details id="det">
 <summary>Maldon East and Maldon West</summary>
-<p>Ground: Environment Agency 1 m LIDAR (2022), so the 1990 bypass and later building are in it. "As built" shows the stations new (1848 and 1889); the other button shows how they stood in the early 1980s. Layout: the 1897 Ordnance Survey plans reproduced in the Essex County Council survey (2011), placed using today's roads and the Lovers Lane crossing (about ±25 m). Buildings, heights, the overbridge, the rolling stock and the Maldon West cutting are inferred and drawn as simple blocks.</p>
+<p>Ground: Environment Agency 1 m LIDAR (2022), so the 1990 bypass and later building are in it. "As built" shows the stations new (1848 and 1889); the other button shows how they stood in the early 1980s. Layout: the 1897 Ordnance Survey plans reproduced in the Essex County Council survey (2011), placed using today's roads and the Lovers Lane crossing (about ±25 m). Buildings, heights, the overbridge and the rolling stock are inferred and drawn as simple blocks. Maldon West (platforms, canopies, buildings, goods shed, cutting edges and the line through the tunnel) is placed from footprints traced on the Ordnance Survey 25-inch map of Essex (1890s), courtesy of the National Library of Scotland, to about 1-2 m; the 1897 plan overlay for Maldon West is still the older, less accurate placement.</p>
 <div class="row"><button data-era="built" class="on">As built (1848, 1889)</button><button data-era="eighties">Early 1980s</button></div>
 <div class="row">
 <button data-v="station">Station</button><button data-v="facade">Station front</button><button data-v="bridge">Overbridge</button><button data-v="road">From the road</button><button data-v="shed">Goods shed</button><button data-v="triangle">Triangle</button><button data-v="wstation">Maldon West</button><button data-v="wtunnel">West tunnel</button><button data-v="wshed">West goods shed</button><button data-v="lcut">Cutting</button><button data-v="lroad">London Road</button><button data-v="lviad">Chelmer viaduct</button><button data-v="all">Overview</button>
@@ -42,6 +42,7 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 </details></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="mw_footprints.js"></script>
 <script>
 /*DATA-START*/
 const loadImg=u=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=u;});
@@ -251,6 +252,52 @@ function coveredStairs(p,f,ry,deckY,topY,sd){
   [1,-1].forEach(s2=>{const m=box(t,SLATE,0,7.6,s2*1.1,4.8,.18,2.9,0);m.rotation.x=s2*.7;});
 }
 
+// ---- Maldon West from the traced 1890s footprints (BNG; see data/alignments/mw_1890s_footprints.geojson) ----
+const FPm=window.MWFP;
+const fpPts=n=>FPm.poly[n].map(([E,N])=>GW(E,N));
+function fpObb(n){const P=fpPts(n);let cx=0,cz=0;P.forEach(v=>{cx+=v.x;cz+=v.z;});cx/=P.length;cz/=P.length;
+  let sxx=0,szz=0,sxz=0;P.forEach(v=>{const a=v.x-cx,b=v.z-cz;sxx+=a*a;szz+=b*b;sxz+=a*b;});
+  const th=.5*Math.atan2(2*sxz,sxx-szz);let dx=Math.cos(th),dz=Math.sin(th);if(dz<0){dx=-dx;dz=-dz;}
+  let u0=1e9,u1=-1e9,v0=1e9,v1=-1e9;P.forEach(v=>{const u=(v.x-cx)*dx+(v.z-cz)*dz,w=-(v.x-cx)*dz+(v.z-cz)*dx;u0=Math.min(u0,u);u1=Math.max(u1,u);v0=Math.min(v0,w);v1=Math.max(v1,w);});
+  const um=(u0+u1)/2,vm=(v0+v1)/2;
+  return {x:cx+um*dx-vm*dz,z:cz+um*dz+vm*dx,dx,dz,L:u1-u0,W:v1-v0,ry:Math.atan2(-dz,dx)};}
+function fpExtrude(n,y0,h,mat){const sh=new THREE.Shape(fpPts(n).map(v=>new THREE.Vector2(v.x,-v.z)));
+  const g=new THREE.ExtrudeGeometry(sh,{depth:h,bevelEnabled:false});g.rotateX(-Math.PI/2);const m=new THREE.Mesh(g,mat);m.position.y=y0;G.add(m);return m;}
+function fpGable(n,y0,wallH,rise,roof,mat){fpExtrude(n,y0,wallH,mat);const o=fpObb(n),g=new THREE.Group();g.position.set(o.x,y0+wallH,o.z);g.rotation.y=o.ry;G.add(g);
+  const ang=Math.atan2(rise,o.W/2+.25),len=Math.hypot(o.W/2+.25,rise);
+  [1,-1].forEach(sd=>{const m=box(g,roof,0,rise/2+.06,sd*(o.W/4+.12),o.L+.7,.18,len,0);m.rotation.x=sd*ang;});return o;}
+const fpN=n=>{const o=fpObb(n);return n1-o.z;};
+function mwStation(){
+  const brick=brickMats(1,1,1)[4],concrete=new THREE.MeshLambertMaterial({color:0x8d8d85}),timber=new THREE.MeshLambertMaterial({color:0x4a5646});
+  const D0=deckAtN(206450),pt=D0+.92,roadY=D0+6.2;
+  ['west_platform','east_platform'].forEach(n=>fpExtrude(n,pt-2.4,2.4,concrete));
+  label(ERA=='built'?'Maldon West platforms, from the 1890s OS 25-inch map (about 122 m and 130 m)':'Maldon West platforms (1890s plan; still there in 1978)',...(()=>{const o=fpObb('east_platform');return [o.x,pt+9,o.z];})());
+  if(ERA!='built')return;
+  ['west_canopy','east_canopy'].forEach(n=>{fpExtrude(n,pt+4.0,.18,SLATE);
+    const o=fpObb(n);for(let u=-o.L/2+1;u<=o.L/2;u+=4)[-1,1].forEach(sd=>{const x=o.x+o.dx*u-o.dz*sd*(o.W/2-.6),z=o.z+o.dz*u+o.dx*sd*(o.W/2-.6);box(G,timber,x,pt+2,z,.18,4,.18,0);});});
+  fpGable('east_building',pt,3.7,1.5,SLATE,brick);fpGable('west_building',pt,3.4,1.3,SLATE,brick);fpGable('east_annex',pt,3.2,1.2,SLATE,brick);
+  const bo=fpGable('booking_office',roadY-3,3+3.8,2.2,SLATE,brick);label('Booking office at road level (map footprint about 12 m square; elevations from period photographs not yet modelled)',bo.x,roadY+8,bo.z);
+  ['stairs_west','stairs_east'].forEach(n=>{const o=fpObb(n),g=new THREE.Group();g.position.set(o.x,(pt+roadY)/2,o.z);g.rotation.y=o.ry;G.add(g);
+    const inner=new THREE.Group();inner.rotation.z=Math.atan2(roadY-pt,o.L);g.add(inner);box(inner,timber,0,0,0,Math.hypot(o.L,roadY-pt),.25,o.W,0);});
+  const bd=fpObb('bridge_deck');box(G,new THREE.MeshLambertMaterial({color:0x3a3d3f}),bd.x,roadY-.2,bd.z,bd.L,.5,bd.W,bd.ry);
+}
+function mwYard(){
+  const brick=brickMats(1,1,1)[4],stone=STONE;
+  const gAt=n=>{const o=fpObb(n);return ground(o.x,o.z);};
+  // goods shed: one pitched bay on the traced footprint, the north gable (facing the road) with a round window and arched doors, as in the surviving shed
+  {const y0=gAt('goods_shed'),WH=5.4,RH=3.9,o=fpGable('goods_shed',y0,WH,RH,SLATE,brick);
+   const sh=new THREE.Group();sh.position.set(o.x,y0,o.z);sh.rotation.y=o.ry;G.add(sh);const gx=-o.L/2-.04;
+   const ring=new THREE.Mesh(new THREE.RingGeometry(.7,.95,24),new THREE.MeshLambertMaterial({color:0xcfc8b4,side:THREE.DoubleSide}));ring.position.set(gx,WH+2.4,0);ring.rotation.y=-Math.PI/2;sh.add(ring);
+   const eye=new THREE.Mesh(new THREE.CircleGeometry(.7,24),DOOR);eye.position.set(gx-.01,WH+2.4,0);eye.rotation.y=-Math.PI/2;sh.add(eye);
+   const d1=arch(3.6,4.4,DOOR);d1.position.set(gx,0,0);d1.rotation.y=-Math.PI/2;sh.add(d1);
+   label('Maldon West goods shed, 46 x 14 m on the 1890s map (survives; height and details inferred)',o.x,y0+11,o.z);}
+  fpGable('shed_office',gAt('shed_office'),3.0,1.4,SLATE,brick);
+  fpExtrude('signal_box',gAt('signal_box'),3.6,new THREE.MeshLambertMaterial({color:0x7a6a50}));
+  fpExtrude('weighing_machine',gAt('weighing_machine'),.5,M.dark);
+  fpExtrude('end_side_dock',gAt('end_side_dock')-.2,1.1,new THREE.MeshLambertMaterial({color:0x8d8d85}));
+  ['house_nw','house_w2','house_e','cottage'].forEach(n=>fpGable(n,gAt(n),5.0,2.2,SLATE,brick));
+  const sp=fpObb('tunnel_south_portal_structure');label('1890s map: south portal structure',sp.x,gAt('tunnel_south_portal_structure')+9,sp.z);
+}
 // Maldon West: cutting re-dug (adjustable), platforms, blocked tunnel portals, the surviving goods shed
 function buildWest(){
   const railsW=new THREE.Group();railsW.name='rails';G.add(railsW);const offs=ERA=='built'?[-2.3,2.3]:[0];
@@ -259,13 +306,10 @@ function buildWest(){
   const dV=probe[idxNear(probe,584545,207568)].d,dN=probe[idxNear(probe,584741,207754)].d;
   const rl=trackLine(route,railsW,[{d:dV,half:14.5},{d:dN,half:10}],GW,offs);
   const rn=rl.filter(p=>n1-p.z<=206800).reverse();
-  const rs=trackLine(WEST_S.map(([x,y])=>[x,y,-99]),railsW,null,WW,offs);
-  const nearW=(r,u,v)=>{const q=WW(u,v);let b=0,bd=1e9;r.forEach((p,k)=>{const d=Math.hypot(p.x-q.x,p.z-q.z);if(d<bd){bd=d;b=k;}});return b;};
+  const rs=trackLine(WEST_S.map(([E,N])=>[E,N,-99]),railsW,null,GW,offs);
+  const nearW=(r,E,N)=>{const q=GW(E,N);let b=0,bd=1e9;r.forEach((p,k)=>{const d=Math.hypot(p.x-q.x,p.z-q.z);if(d<bd){bd=d;b=k;}});return b;};
   const concrete=new THREE.MeshLambertMaterial({color:0x8d8d85});
-  // two platforms either side of the track (the building's demolition date is unsourced; the platforms are inferred from a 1978 photo)
-  {const k=idxNear(rn,584205,206510),p=rn[k],f=frame(rn,k),ry=Math.atan2(-f.dz,f.dx),y=p.deck;
-   [-1,1].forEach(sd=>{const m=brickMats(65,.92,3.6,0xd9c9b8);m[2]=concrete;box(G,m,p.x+f.nx*sd*(2.4+1.8),y+.46,p.z+f.nz*sd*(2.4+1.8),65,.92,3.6,ry);});
-   label(ERA=='built'?'Maldon West station, 1889: platforms (sizes inferred)':'Maldon West station site: platforms inferred',p.x,y+9,p.z);}
+  mwStation();
   // tunnel portals, bricked up. Spital Road runs over the top.
   {
    {const k=rn.length-1,p=rn[k],f=frame(rn,k),ry=Math.atan2(-f.dz,f.dx),y=p.deck,hh=6.2;
@@ -275,37 +319,14 @@ function buildWest(){
     const a=arch(5.2,4.6,ERA=='built'?DOOR:PANEL);a.position.set(p.x-f.dx*.03,y,p.z-f.dz*.03);a.rotation.y=Math.atan2(-f.dx,-f.dz);G.add(a);
     [-1,1].forEach(sd=>box(G,new THREE.MeshLambertMaterial({color:0x232a2e}),p.x-f.dx*.04+f.nx*sd*3.4,y+hh-1.2,p.z-f.dz*.04+f.nz*sd*3.4,.1,1.1,.9,ry));
     label(ERA=='built'?'Tunnel, north portal (open)':'Tunnel, north portal: bricked up',p.x,y+hh+4,p.z);
-    if(ERA=='built'){const topY=baseAt(TW,p.x+f.dx*8,p.z+f.dz*8);bookingOffice(p,f,ry,y+hh);[-1,1].forEach(sd=>coveredStairs(p,f,ry,y,y+hh+.4,sd));
-      label('Booking office at road level and covered footbridge (from photographs)',p.x+f.dx*5,y+hh+9,p.z+f.dz*5);}}
+    }
    {const p=rs[0],f=frame(rs,0),ry=Math.atan2(-f.dz,f.dx),y=p.deck,hh=4.4;
     box(G,brickMats(1.4,hh,10,0x7d8794),p.x-f.dx*.7,y+hh/2-.1,p.z-f.dz*.7,1.4,hh,10,ry);
     box(G,STONE,p.x-f.dx*.7,y+hh+.05,p.z-f.dz*.7,1.8,.25,10.4,ry);
     const a=arch(5,4,DOOR);a.position.set(p.x+f.dx*.03,y,p.z+f.dz*.03);a.rotation.y=Math.atan2(f.dx,f.dz);G.add(a);
     label(ERA=='built'?'Tunnel, south portal (open)':'Tunnel, south portal: blue brick; survey 2011: blocked, now a store (local knowledge)',p.x,y+hh+5,p.z);}
   }
-  if(ERA=='built'){
-    const sd=trackLine([[575,440,-99],[566,500,-99],[556,545,-99],[554,700,-99]],railsW,null,WW);
-    [0,6.4,12.8].forEach(d=>{const q=sd[Math.min(sd.length-1,Math.round(30/3)+Math.round(d/3))],f=frame(sd,sd.indexOf(q));rollingStock('wagon',q.x,q.deck+.17,q.z,Math.atan2(-f.dz,f.dx));});
-  }
-  // the goods shed that survives in West Station Yard (red brick, round window in the gable, arched doors; size inferred)
-  {const k=nearW(rs,548,580),f=frame(rs,k),ry=Math.atan2(-f.dz,f.dx),q=WW(548,580),g0=ground(q.x,q.z);
-   const sh=new THREE.Group();sh.position.set(q.x,g0,q.z);sh.rotation.y=ry;G.add(sh);
-   const bay=(zc,L,Wd,WH,RH,roof)=>{
-     box(sh,brickMats(L,WH,Wd),0,WH/2,zc,L,WH,Wd,0);
-     box(sh,STONE,0,WH-.05,zc,L+.4,.25,Wd+.4,0);
-     const ang=Math.atan2(RH,Wd/2+.3),len=Math.hypot(Wd/2+.3,RH);
-     [1,-1].forEach(sd=>{const m=box(sh,roof,0,WH+RH/2+.06,zc+sd*(Wd/4+.15),L+.8,.2,len,0);m.rotation.x=sd*ang;});
-     [-1,1].forEach(sd=>{const g=new THREE.Shape();g.moveTo(-Wd/2,0);g.lineTo(Wd/2,0);g.lineTo(0,RH);g.lineTo(-Wd/2,0);
-       const gm=new THREE.Mesh(new THREE.ExtrudeGeometry(g,{depth:.45,bevelEnabled:false}),brickMats(1,1,1)[4]);gm.material.map.repeat.set(Wd/.9,RH/.9);
-       gm.rotation.y=Math.PI/2;gm.position.set(sd*L/2+(sd>0?0:-.45),WH,zc);sh.add(gm);});
-   };
-   bay(0,26,12,5.4,3.9,SLATE);bay(-11,26,10,4.8,3.2,new THREE.MeshLambertMaterial({color:0x5d6b55}));
-   // north gable (facing the road): round window with a stone ring, tall arched doorway, two arched windows
-   const ring=new THREE.Mesh(new THREE.RingGeometry(.7,.95,24),new THREE.MeshLambertMaterial({color:0xcfc8b4,side:THREE.DoubleSide}));ring.position.set(-13.05,5.4+2.4,0);ring.rotation.y=-Math.PI/2;sh.add(ring);
-   const eye=new THREE.Mesh(new THREE.CircleGeometry(.7,24),DOOR);eye.position.set(-13.04,5.4+2.4,0);eye.rotation.y=-Math.PI/2;sh.add(eye);
-   const d1=arch(3.6,4.4,DOOR);d1.position.set(-13.04,0,0);d1.rotation.y=-Math.PI/2;sh.add(d1);
-   [-1,1].forEach(sd=>{const a=arch(1.6,3,PANEL);a.position.set(-13.04,.9,sd*4);a.rotation.y=-Math.PI/2;sh.add(a);});
-   label('Maldon West goods shed (survives; inferred size)',q.x,g0+11,q.z);}
+  mwYard();
   // ---- structures on the line between Maldon West and Maldon East ----
   const footbridge=(p,f,ry,full,name)=>{
     const g=new THREE.Group();g.position.set(p.x,p.deck,p.z);g.rotation.y=ry;G.add(g);const H=5.3;
@@ -501,20 +522,24 @@ const gv=id=>document.getElementById(id);gv('det').open=innerWidth>700;
 // Rail level: 26.0 m at the tunnel (yard floor 27.0 m less 1 m, Jon), falling to about 10 m at the Chelmer viaduct (the 1990 bridge is 1.8 m lower than the old deck, so the old deck is taken as about 10 m).
 const A414=[[584145,206645],[584142,206675],[584141,206705],[584139,206735],[584140,206765],[584142,206795],[584145,206825],[584149,206855],[584155,206885],[584161,206915],[584169,206945],[584179,206975],[584189,207005],[584201,207035],[584215,207065],[584228,207095],[584243,207125],[584258,207155],[584273,207185],[584288,207215],[584303,207245],[584318,207275],[584333,207305],[584351,207335],[584365,207365],[584382,207395],[584401,207425],[584420,207455],[584445,207485],[584472,207515],[584502,207545]];
 const deckAtN=n=>{const off=+gv('cut').value,D0=26.0+off;
-  if(n<=206445)return D0;if(n<=207568)return D0-(n-206445)*(D0-10.0)/(207568-206445);return Math.max(7.3,10.0-(n-207568)*2.7/196);};
+  if(n<=206520)return D0;if(n<=207568)return D0-(n-206520)*(D0-10.0)/(207568-206520);return Math.max(7.3,10.0-(n-207568)*2.7/196);};
 function linkRoute(){
-  const p=[[584227,206440],[584216,206480],[584202,206525],[584180,206575],[584158,206615]];
+  const p=axisN();
   A414.forEach(q=>p.push(q));
   [...WF_LINE].reverse().forEach(([u,v])=>{const w=W(u,v);p.push([w.x+e0,n1-w.z]);});
   return p.map(([E,N])=>[E,N,deckAtN(N)]);
 }
-const WEST_S=[[574,326],[576,400],[580,450],[582,540],[584,640],[590,760]];
+// Maldon West axis from the 1890s map-snapped centreline (BNG, south to north); tunnel between the portals at N 206331 and N 206386
+const MW_AXIS=window.MWFP.axis,PORTAL_S=206331,PORTAL_N=206386;
+function axisAt(n){for(let i=0;i<MW_AXIS.length-1;i++){const a=MW_AXIS[i],b=MW_AXIS[i+1];if(n>=a[1]&&n<=b[1]){const t=(n-a[1])/(b[1]-a[1]);return [a[0]+t*(b[0]-a[0]),n];}}return MW_AXIS[MW_AXIS.length-1];}
+function axisN(){return [axisAt(PORTAL_N),...MW_AXIS.filter(q=>q[1]>PORTAL_N+3)];}
+const WEST_S=[axisAt(PORTAL_S),...MW_AXIS.filter(q=>q[1]<PORTAL_S-3).reverse()];
 function baseAt(t,x,z){const j=Math.round((x-t.ox)/t.cell),i=Math.round((z-t.oz)/t.cell);return t.base[Math.min(t.h-1,Math.max(0,i))*t.w+Math.min(t.w-1,Math.max(0,j))];}
 // re-dig the cutting: flat floor at rail level, side slopes 1:1.5 up to the existing ground
 function carveWest(){
   TW.H2.set(TW.base);TM.H2.set(TM.base);
   const half=7.5,slope=1.5;
-  const rt=linkRoute().map(([E,N])=>GW(E,N)),ws=WEST_S.map(([x,y])=>WW(x,y));
+  const rt=linkRoute().map(([E,N])=>GW(E,N)),ws=WEST_S.map(([E,N])=>GW(E,N));
   const runs=[[rt,'n'],[ws,'s']];
   for(const [pts,kind] of runs){
     let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;pts.forEach(q=>{x0=Math.min(x0,q.x);x1=Math.max(x1,q.x);z0=Math.min(z0,q.z);z1=Math.max(z1,q.z);});
@@ -530,6 +555,16 @@ function carveWest(){
     }
   }
 }
+// Maldon West cutting between the top edges traced from the 1890s map: flat floor at rail level, sides rising to the ground over 24 m at the traced edge
+function carveCutting(){
+  const E=FPm.edges,A=E.cut_west_top.map(([e,n])=>GW(e,n)),B=E.cut_east_top.map(([e,n])=>GW(e,n)),poly=[...A,...B.slice().reverse()];
+  const inside=(x,z)=>{let c=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[i],b=poly[j];if((a.z>z)!=(b.z>z)&&x<(b.x-a.x)*(z-a.z)/(b.z-a.z)+a.x)c=!c;}return c;};
+  const dseg=(L,x,z)=>{let bd=1e9;for(let k=0;k<L.length-1;k++){const a=L[k],b=L[k+1],dx=b.x-a.x,dz=b.z-a.z,u=Math.max(0,Math.min(1,((x-a.x)*dx+(z-a.z)*dz)/(dx*dx+dz*dz))),d=Math.hypot(x-a.x-dx*u,z-a.z-dz*u);if(d<bd)bd=d;}return bd;};
+  let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;poly.forEach(q=>{x0=Math.min(x0,q.x);x1=Math.max(x1,q.x);z0=Math.min(z0,q.z);z1=Math.max(z1,q.z);});
+  for(const t of tiles){const j0=Math.max(0,Math.floor((x0-t.ox)/t.cell)),j1=Math.min(t.w-1,Math.ceil((x1-t.ox)/t.cell)),i0=Math.max(0,Math.floor((z0-t.oz)/t.cell)),i1=Math.min(t.h-1,Math.ceil((z1-t.oz)/t.cell));
+    for(let i=i0;i<=i1;i++)for(let j=j0;j<=j1;j++){const x=t.ox+j*t.cell,z=t.oz+i*t.cell;if(!inside(x,z))continue;
+      const d=Math.min(dseg(A,x,z),dseg(B,x,z)),k=i*t.w+j,D0=deckAtN(n1-z),v=D0+Math.max(0,t.base[k]-D0)*Math.max(0,1-d/24);if(v<t.H2[k])t.H2[k]=v;}}
+}
 // lower the Fullbridge road corridor to its 1980s level (the road has been raised since)
 function carve(){
   H2.set(base);const r=riseV();
@@ -542,7 +577,7 @@ function carve(){
       if(bd<22){const side=bd<6?1:1-(bd-6)/16,along=Math.min(1,bs/40,(tot-bs)/40);H2[i*w+j]=base[i*w+j]-r*side*side*(3-2*side)*Math.max(0,along);}
     }
   }
-  carveWest();
+  carveWest();carveCutting();
   tiles.forEach(t=>{const pa=t.geo.attributes.position;for(let i=0;i<t.w*t.h;i++)pa.array[i*3+1]=t.H2[i];pa.needsUpdate=true;t.geo.computeVertexNormals();});
 }
 function setUniforms(){const q=T(),[E,N]=toEN(-715,-462);OE.u.uP.value.set(q.s,q.t,0,0);OE.u.uT.value.set(E,N);const qw=Tw(),[E2,N2]=toENW(0,0);OW.u.uP.value.set(qw.s,qw.t,0,0);OW.u.uT.value.set(E2,N2);}
@@ -573,15 +608,15 @@ const V={
  lcut:()=>orbitG(584160,206600,350,80,22),
  lroad:()=>orbitG(584190,207010,235,55,16),
  lviad:()=>orbitG(584545,207568,320,70,14),
- wstation:()=>orbitW([520,170],250,95,24),
- wtunnel:()=>orbitW([570,284],0,48,11),
- wshed:()=>orbitW([548,580],325,62,14),
+ wstation:()=>orbitG(584178,206440,250,95,24),
+ wtunnel:()=>orbitG(584208,206335,0,48,11),
+ wshed:()=>orbitG(584193,206116,325,62,14),
  triangle:()=>orbit(J(620,420),6,200,330,40),
  all:()=>orbit([640,560],4,215,430,42)
 };
 document.querySelectorAll('[data-era]').forEach(b=>b.onclick=()=>{ERA=b.dataset.era;document.querySelectorAll('[data-era]').forEach(x=>x.classList.toggle('on',x==b));gv('rails').checked=ERA=='built';build();});
 document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const [f,t]=V[b.dataset.v]();look(f,t);});
-{const q=new URLSearchParams(location.search);if(q.get('era')=='eighties'){ERA='eighties';document.querySelectorAll('[data-era]').forEach(x=>x.classList.toggle('on',x.dataset.era=='eighties'));gv('rails').checked=false;build();}if(q.get('map')){gv('map').value=q.get('map');applyToggles();}const [f,t]=V[q.get('v')||'station']();look(f,t);}
+{const q=new URLSearchParams(location.search);if(q.get('era')=='eighties'){ERA='eighties';document.querySelectorAll('[data-era]').forEach(x=>x.classList.toggle('on',x.dataset.era=='eighties'));gv('rails').checked=false;build();}if(q.get('map')){gv('map').value=q.get('map');applyToggles();}const [f,t]=V[q.get('v')||'station']();look(f,t);if(q.get('cam')){const c=q.get('cam').split(',').map(Number),ex=+gv('ex').value,a=GW(c[0],c[1]),b=GW(c[3],c[4]);look(new THREE.Vector3(a.x,c[2]*ex,a.z),new THREE.Vector3(b.x,c[5]*ex,b.z));}}
 function size(){const Wd=innerWidth,Ht=innerHeight;R.setSize(Wd,Ht,false);cam.aspect=Wd/Ht;cam.updateProjectionMatrix();}
 addEventListener('resize',size);size();
 const v3=new THREE.Vector3();
