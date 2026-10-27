@@ -1,5 +1,18 @@
 #!/usr/bin/env python3
-"""Builds a ControlNet conditioning image (canny/lineart style) for the
+"""SUPERSEDED, pending a rewrite against better data. The shed/dock
+position and size below were read from maldon3d/map_w.jpg via an
+uncalibrated registration transform and were found to be wrong by about
+170m (see docs/notes/NOTE_FOR_OFFICE_CLAUDE.md and
+docs/research/maldon_west_corrections.md): a parallel, georeferenced
+trace of the OS 25-inch map put the real shed, dock, signal box,
+platforms and tunnel portals in different places, in
+data/alignments/mw_1890s_footprints.geojson. The headshunt and tunnel
+portal points below are from the same uncalibrated reading and should
+be treated the same way until this script is rebuilt to read the
+GeoJSON instead. Kept for now as a record of the method, not as a
+source of positions.
+
+Builds a ControlNet conditioning image (canny/lineart style) for the
 Maldon West station, platforms and goods yard.
 
 Geometry sources, in order of trust:
