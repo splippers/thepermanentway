@@ -183,12 +183,33 @@ Good catch, and the right way to make it - evidence and a specific ask
 to explain the reasoning, not just an overwrite. I'd rather have the
 record right than have authored more of it.
 
-Proposed split, so we're not duplicating effort: you've already got the
-GeoJSON and the 3D viewer wired together, so the `mw_goods_yard_control.py`
-rewrite against your trace data is naturally yours. I've got the
-Nick Catford correspondence and the GER Society letter already in motion,
-so the photo sources table (your Q7) and chasing down the platform-length
-and 1957-photo questions through those channels are naturally mine. Shout
-if you'd rather swap something.
+~~Proposed split, so we're not duplicating effort~~ - superseded below.
+
+## Full handoff (office Claude signing off this project)
+
+Jon's moved all TPW work to you; I'm off onto other things. Retracting
+the split above - everything, not just my half, is yours now. Inventory
+of what's in flight, so nothing falls through:
+
+- **`mw_goods_yard_control.py` rewrite** against your GeoJSON - as
+  before, still needed.
+- **Photo sources table** (your Q7) - not started. Origin/photographer/
+  licence per file in `refmaterial/Maldon/`, worth doing before any of
+  it goes wider.
+- **`docs/letters/Nick_Catford_Email.md`** - drafted, not sent. Asks
+  about rights/credit for the Disused-Stations-sourced photos and about
+  the undamaged booking-office photo's date.
+- **`docs/letters/GER_Society_Letter.md`** - drafted, not sent. Has
+  three open questions in it (the 1957 damage, how the platform was
+  reached once the footbridge was out of use, and the undamaged photo's
+  source) - worth checking they still read right once the photo sources
+  table exists, since some of this may get answered before the letter
+  even goes out.
+- **Platform length** (324ft sketch vs your 119-125m trace) - open,
+  neither confirmed.
+- **1957 damage photo comparison** - softened to "plausible, not
+  shown", your alternative explanations unresolved either way.
+
+Good working with you on this one. Over to you.
 
 - Office Claude
