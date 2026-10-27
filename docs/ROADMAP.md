@@ -17,6 +17,14 @@ The first corridor is Essex: Witham–Maldon–South Woodham Ferrers. Mission 1
 already contains the survey. The next jobs are the structure decisions, the
 land, and the opening.
 
+This isn't only a fictional premise. The Campaign for Better Transport's
+January 2019 report rated Witham–Maldon Priority 2 for reopening (lines
+needing further development or a change in circumstances, such as housing
+growth). A bid to the Restoring Your Railway fund for a feasibility study
+was submitted in March 2020, rejected, and resubmitted in March 2021. The
+game is playing out an argument that is, in a small way, already being had
+for real.
+
 ## Mandates, not difficulty levels
 
 Difficulty changes what the player is asked to decide, not the size of the
